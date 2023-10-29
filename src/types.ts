@@ -1,21 +1,34 @@
-import { AnyActorRef, AnyEventObject } from 'xstate';
+import { AnyActorRef, AnyEventObject, InspectionEvent } from 'xstate';
 
 export interface BaseInspectionEvent {
   // the session ID of the root
-  actorSystemId: string;
+  rootId: string;
+  sessionId: string;
   createdAt: string; // Timestamp
   id: string; // unique string for this actor update
   _version: string; // version of this protocol
 }
 
-export interface ActorTransitionEvent {
-  type: '@xstate.snapshot';
-  snapshot: any;
-  event: AnyEventObject; // { type: string, ... }
-  status: 0 | 1 | 2; // 0 = not started, 1 = started, 2 = stopped
-  sessionId: string;
-  sourceId?: string; // Session ID
-}
+export type ActorSnapshotEvent = Pick<
+  InspectionEvent & { type: '@xstate.snapshot' },
+  'event' | 'rootId' | 'snapshot' | 'type'
+> &
+  BaseInspectionEvent;
+
+export type ActorEventEvent = Pick<
+  InspectionEvent & { type: '@xstate.event' },
+  'event' | 'rootId' | 'type'
+> & {
+  // used instead of sourceRef
+  sourceId: string | undefined;
+} & BaseInspectionEvent;
+
+export type ActorActorEvent = Pick<
+  InspectionEvent & { type: '@xstate.actor' },
+  'type'
+> & {
+  definition?: string; // JSON-stringified definition or URL
+} & BaseInspectionEvent;
 
 export interface ActorCommunicationEvent {
   type: '@xstate.event';
@@ -32,15 +45,13 @@ export interface ActorRegistrationEvent {
   definition?: string; // JSON-stringified definition or URL
 }
 
-export type InspectionEvent =
-  | ActorTransitionEvent
-  | ActorCommunicationEvent
-  | ActorRegistrationEvent;
-
-export type ResolvedInspectionEvent = InspectionEvent & BaseInspectionEvent;
+export type ActorEvents =
+  | ActorSnapshotEvent
+  | ActorEventEvent
+  | ActorActorEvent;
 
 export interface Adapter {
   start(): void;
   stop(): void;
-  send(event: ResolvedInspectionEvent): void;
+  send(event: ActorEvents): void;
 }

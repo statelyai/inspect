@@ -1,7 +1,6 @@
-import type { AnyActorRef, AnyEventObject } from 'xstate';
-import { Adapter } from './types';
+import type { AnyActorRef, AnyEventObject, InspectionEvent } from 'xstate';
 
-function toEventObject(event: AnyEventObject | string): AnyEventObject {
+export function toEventObject(event: AnyEventObject | string): AnyEventObject {
   if (typeof event === 'string') {
     return { type: event };
   }
@@ -10,7 +9,13 @@ function toEventObject(event: AnyEventObject | string): AnyEventObject {
 }
 
 export interface Inspector {
+  /**
+   * Sends a snapshot inspection event. This represents the state of the actor.
+   */
   snapshot: (sessionId: string, snapshot: any) => void;
+  /**
+   * Sends an event inspection event. This represents the event that was sent to the actor.
+   */
   event: (
     event: AnyEventObject | string,
     {
@@ -21,63 +26,32 @@ export interface Inspector {
       target: string;
     }
   ) => void;
+  /**
+   * Sends an actor registration inspection event. This represents the actor that was created.
+   */
   actor: (
     actorRef: AnyActorRef | string,
     { definition, parent }?: { definition?: string; parent?: string }
   ) => void;
+  /**
+   * Stops the inspector.
+   */
   stop: () => void;
+  /**
+   * An inspection observer that can be passed into XState.
+   * @example
+   * ```js
+   * import { createActor } from 'xstate';
+   * import { createInspector } from '@xstate/inspect';
+   * // ...
+   *
+   * const inspector = createInspector(...)
+   *
+   * const actor = createActor(someMachine, {
+   *   inspect: inspector.inspect
+   * })
+   */
+  inspect: (event: InspectionEvent) => void;
 }
 
-export function createInspector(
-  { url }: { url: string },
-  adapter: Adapter
-): Inspector {
-  adapter.start();
-
-  const inspector: Inspector = {
-    actor: (actorRef) => {
-      const sessionId =
-        typeof actorRef === 'string' ? actorRef : actorRef.sessionId;
-
-      adapter.send({
-        type: '@xstate.actor',
-        actorRef: null as any,
-        sessionId,
-        createdAt: Date.now().toString(),
-        _version: '0.0.1',
-        actorSystemId: 'anonymous',
-        id: null as any,
-      });
-    },
-    event(event, { source, target }) {
-      adapter.send({
-        type: '@xstate.event',
-        sourceId: source,
-        targetId: target,
-        event: toEventObject(event),
-        id: Math.random().toString(),
-        createdAt: Date.now().toString(),
-        actorSystemId: 'anonymous',
-        _version: '0.0.1',
-      });
-    },
-    snapshot(sessionId, snapshot) {
-      adapter.send({
-        type: '@xstate.snapshot',
-        snapshot,
-        event: null as any,
-        status: 1,
-        sessionId,
-        id: null as any,
-        createdAt: Date.now().toString(),
-        actorSystemId: 'anonymous',
-        _version: '0.0.1',
-      });
-    },
-    stop() {
-      adapter.stop();
-    },
-  };
-
-  return inspector;
-}
+export { createWebSocketInspector } from './webSocketAdapter';

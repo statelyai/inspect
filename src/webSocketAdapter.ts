@@ -1,33 +1,32 @@
-import { createInspector } from '.';
-import { Adapter, InspectionEvent } from './types';
+import { createInspector } from './createInspector';
+import { Adapter, ActorEvents } from './types';
 import WebSocket from 'isomorphic-ws';
 
 export class WebSocketAdapter implements Adapter {
   private ws!: WebSocket;
-  private open = false;
-  private deferredEvents: InspectionEvent[] = [];
+  private status = 'closed' as 'closed' | 'open';
+  private deferredEvents: ActorEvents[] = [];
   constructor(public url: string) {}
   public start() {
     const start = () => {
-      // this.ws = new WebSocket('ws://localhost:8080');
       this.ws = new WebSocket(this.url);
 
       this.ws.onopen = () => {
         console.log('websocket open');
-        this.open = true;
+        this.status = 'open';
         this.deferredEvents.forEach((event) => {
           this.ws.send(JSON.stringify(event));
         });
       };
 
       this.ws.onclose = () => {
-        console.log('websocket close');
+        console.log('websocket closed');
       };
 
       this.ws.onerror = async (event: unknown) => {
         console.error('websocket error', event);
         await new Promise((res) => setTimeout(res, 5000));
-        console.error('restarting');
+        console.warn('restarting');
         start();
       };
 
@@ -36,7 +35,7 @@ export class WebSocketAdapter implements Adapter {
           return;
         }
 
-        console.log('websocket', event.data);
+        console.log('message', event.data);
       };
     };
 
@@ -44,9 +43,10 @@ export class WebSocketAdapter implements Adapter {
   }
   public stop() {
     this.ws.close();
+    this.status = 'closed';
   }
-  public send(event: InspectionEvent) {
-    if (this.open) {
+  public send(event: ActorEvents) {
+    if (this.status === 'open') {
       this.ws.send(JSON.stringify(event));
     } else {
       this.deferredEvents.push(event);
@@ -57,7 +57,7 @@ export class WebSocketAdapter implements Adapter {
 export function createWebSocketInspector(url: string) {
   const adapter = new WebSocketAdapter(url);
 
-  const inspector = createInspector({ url }, adapter);
+  const inspector = createInspector(adapter);
 
   return inspector;
 }
