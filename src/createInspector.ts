@@ -5,14 +5,34 @@ import {
   ActorSnapshotEvent,
   Adapter,
 } from './types';
-import { Inspector, toEventObject } from '.';
-import { InspectionEvent } from 'xstate';
+import { toEventObject } from './utils';
+import { Inspector } from './types';
+import { AnyActorRef, InspectionEvent } from 'xstate';
+
+function getRoot(actorRef: AnyActorRef) {
+  let marker: AnyActorRef | undefined = actorRef;
+
+  do {
+    marker = marker._parent;
+  } while (marker?._parent);
+
+  return marker;
+}
+
+function getRootId(actorRefOrId: AnyActorRef | string): string | undefined {
+  const rootActorRef =
+    typeof actorRefOrId === 'string'
+      ? undefined
+      : getRoot(actorRefOrId)?.sessionId;
+
+  return rootActorRef ?? undefined;
+}
 
 export function createInspector(adapter: Adapter): Inspector {
-  adapter.start();
+  adapter.start?.();
 
   const inspector: Inspector = {
-    actor: (actorRef) => {
+    actor: (actorRef, info) => {
       const sessionId =
         typeof actorRef === 'string' ? actorRef : actorRef.sessionId;
 
@@ -21,8 +41,10 @@ export function createInspector(adapter: Adapter): Inspector {
         sessionId,
         createdAt: Date.now().toString(),
         _version: '0.0.1',
-        rootId: 'anonymous',
+        rootId: info?.rootId,
+        parentId: info?.parentId,
         id: null as any,
+        definition: undefined, // TODO
       } satisfies ActorActorEvent);
     },
     event(event, { source, target }) {
@@ -54,7 +76,7 @@ export function createInspector(adapter: Adapter): Inspector {
       adapter.send(convertedEvent);
     },
     stop() {
-      adapter.stop();
+      adapter.stop?.();
     },
   };
 
@@ -72,6 +94,7 @@ export function convertXStateEvent(
         createdAt: Date.now().toString(),
         id: null as any,
         rootId: inspectionEvent.rootId,
+        parentId: inspectionEvent.actorRef._parent?.sessionId,
         sessionId: inspectionEvent.actorRef.sessionId,
       } satisfies ActorActorEvent;
     }

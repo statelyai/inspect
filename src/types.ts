@@ -2,7 +2,7 @@ import { AnyActorRef, AnyEventObject, InspectionEvent } from 'xstate';
 
 export interface BaseInspectionEvent {
   // the session ID of the root
-  rootId: string;
+  rootId: string | undefined;
   sessionId: string;
   createdAt: string; // Timestamp
   id: string; // unique string for this actor update
@@ -27,7 +27,8 @@ export type ActorActorEvent = Pick<
   InspectionEvent & { type: '@xstate.actor' },
   'type'
 > & {
-  definition?: string; // JSON-stringified definition or URL
+  definition: string | undefined; // JSON-stringified definition or URL
+  parentId: string | undefined;
 } & BaseInspectionEvent;
 
 export interface ActorCommunicationEvent {
@@ -51,7 +52,52 @@ export type ActorEvents =
   | ActorActorEvent;
 
 export interface Adapter {
-  start(): void;
-  stop(): void;
+  start?: () => void;
+  stop?: () => void;
   send(event: ActorEvents): void;
+}
+export interface Inspector {
+  /**
+   * Sends a snapshot inspection event. This represents the state of the actor.
+   */
+  snapshot: (sessionId: string, snapshot: any) => void;
+  /**
+   * Sends an event inspection event. This represents the event that was sent to the actor.
+   */
+  event: (
+    event: AnyEventObject | string,
+    {
+      source,
+      target,
+    }: {
+      source?: string;
+      target: string;
+    }
+  ) => void;
+  /**
+   * Sends an actor registration inspection event. This represents the actor that was created.
+   */
+  actor: (
+    actorRef: AnyActorRef | string,
+    info?: { definition?: string; parentId?: string; rootId?: string }
+  ) => void;
+  /**
+   * Stops the inspector.
+   */
+  stop: () => void;
+  /**
+   * An inspection observer that can be passed into XState.
+   * @example
+   * ```js
+   * import { createActor } from 'xstate';
+   * import { createInspector } from '@xstate/inspect';
+   * // ...
+   *
+   * const inspector = createInspector(...)
+   *
+   * const actor = createActor(someMachine, {
+   *   inspect: inspector.inspect
+   * })
+   */
+  inspect: (event: InspectionEvent) => void;
 }

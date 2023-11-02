@@ -3,7 +3,19 @@ import { createInspector } from './createInspector';
 import { ActorEvents, Adapter } from './types';
 import { createActor, createMachine } from 'xstate';
 
-test('adds 1 + 2 to equal 3', async () => {
+function simplifyEvent(ev: ActorEvents) {
+  return ev.type === '@xstate.actor'
+    ? { type: ev.type, sessionId: ev.sessionId }
+    : ev.type === '@xstate.event'
+    ? { type: ev.type, sessionId: ev.sessionId, event: ev.event }
+    : {
+        type: ev.type,
+        sessionId: ev.sessionId,
+        snapshot: (ev.snapshot as any).value,
+      };
+}
+
+test('Creates an inspector for a state machine', async () => {
   const events: ActorEvents[] = [];
   const testAdapter: Adapter = {
     send: (event) => {
@@ -39,19 +51,7 @@ test('adds 1 + 2 to equal 3', async () => {
 
   await new Promise<void>((res) => {
     setTimeout(() => {
-      expect(
-        events.map((ev) =>
-          ev.type === '@xstate.actor'
-            ? { type: ev.type, sessionId: ev.sessionId }
-            : ev.type === '@xstate.event'
-            ? { type: ev.type, sessionId: ev.sessionId, event: ev.event }
-            : {
-                type: ev.type,
-                sessionId: ev.sessionId,
-                snapshot: (ev.snapshot as any).value,
-              }
-        )
-      ).toMatchInlineSnapshot(`
+      expect(events.map(simplifyEvent)).toMatchInlineSnapshot(`
         [
           {
             "sessionId": "x:0",
