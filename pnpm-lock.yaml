@@ -8,8 +8,8 @@ dependencies:
     specifier: ^8.13.0
     version: 8.14.1
   xstate:
-    specifier: 5.0.0-beta.38
-    version: 5.0.0-beta.38
+    specifier: 5.0.0-beta.44
+    version: 5.0.0-beta.44
 
 devDependencies:
   tsup:
@@ -1281,8 +1281,8 @@ packages:
         optional: true
     dev: false
 
-  /xstate@5.0.0-beta.38:
-    resolution: {integrity: sha512-8hOXlbfcbLbSFgX20E0mwPPImFPtnRG+NhkupB9TtfYaPk7HyHi4BSDdN7gpoyBbvDm5VbqRwYVquR58WbhCVA==}
+  /xstate@5.0.0-beta.44:
+    resolution: {integrity: sha512-cqYg51v1UrWRDoho/EolyEu85YyzaS+tI3C+VJUuSId6++WwrT6NiVxolG5cd0uG5jyjB3+Xje7erfYIQOcpLw==}
     dev: false
 
   /yaml@2.3.2:
