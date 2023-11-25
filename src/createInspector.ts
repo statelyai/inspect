@@ -1,13 +1,13 @@
 import {
-  ActorActorEvent,
-  ActorEventEvent,
-  ActorEvents,
-  ActorSnapshotEvent,
+  StatelyActorEvent,
+  StatelyEventEvent,
+  StatelyInspectionEvent,
+  StatelySnapshotEvent,
   Adapter,
 } from './types';
 import { toEventObject } from './utils';
 import { Inspector } from './types';
-import { AnyActorRef, InspectionEvent } from 'xstate';
+import { Actor, AnyActorRef, InspectionEvent, StateMachine } from 'xstate';
 
 function getRoot(actorRef: AnyActorRef) {
   let marker: AnyActorRef | undefined = actorRef;
@@ -36,6 +36,12 @@ export function createInspector(adapter: Adapter): Inspector {
       const sessionId =
         typeof actorRef === 'string' ? actorRef : actorRef.sessionId;
 
+      const definition =
+        info?.definition ??
+        (actorRef instanceof Actor && actorRef.logic instanceof StateMachine
+          ? JSON.stringify(actorRef.logic.definition)
+          : undefined);
+
       adapter.send({
         type: '@xstate.actor',
         sessionId,
@@ -44,8 +50,8 @@ export function createInspector(adapter: Adapter): Inspector {
         rootId: info?.rootId,
         parentId: info?.parentId,
         id: null as any,
-        definition: undefined, // TODO
-      } satisfies ActorActorEvent);
+        definition,
+      } satisfies StatelyActorEvent);
     },
     event(event, { source, target }) {
       adapter.send({
@@ -71,9 +77,11 @@ export function createInspector(adapter: Adapter): Inspector {
         _version: '0.0.1',
       });
     },
-    inspect(event) {
-      const convertedEvent = convertXStateEvent(event);
-      adapter.send(convertedEvent);
+    inspect: {
+      next: (event) => {
+        const convertedEvent = convertXStateEvent(event);
+        adapter.send(convertedEvent);
+      },
     },
     stop() {
       adapter.stop?.();
@@ -82,21 +90,34 @@ export function createInspector(adapter: Adapter): Inspector {
 
   return inspector;
 }
+
 export function convertXStateEvent(
   inspectionEvent: InspectionEvent
-): ActorEvents {
+): StatelyInspectionEvent {
   switch (inspectionEvent.type) {
     case '@xstate.actor': {
+      const actorRef = inspectionEvent.actorRef;
+      const definitionObject = (actorRef as any)?.logic?.config;
+      const definitionString = definitionObject
+        ? JSON.stringify(definitionObject, (key, value) => {
+            if (typeof value === 'function') {
+              return { type: value.name };
+            }
+
+            return value;
+          })
+        : undefined;
+
       return {
         type: '@xstate.actor',
-        definition: undefined, // TODO
+        definition: definitionString,
         _version: '0.0.1',
         createdAt: Date.now().toString(),
         id: null as any,
         rootId: inspectionEvent.rootId,
         parentId: inspectionEvent.actorRef._parent?.sessionId,
         sessionId: inspectionEvent.actorRef.sessionId,
-      } satisfies ActorActorEvent;
+      } satisfies StatelyActorEvent;
     }
     case '@xstate.event': {
       return {
@@ -109,7 +130,7 @@ export function convertXStateEvent(
         createdAt: Date.now().toString(),
         id: null as any,
         rootId: inspectionEvent.rootId,
-      } satisfies ActorEventEvent;
+      } satisfies StatelyEventEvent;
     }
     case '@xstate.snapshot': {
       return {
@@ -121,7 +142,7 @@ export function convertXStateEvent(
         createdAt: Date.now().toString(),
         id: null as any,
         rootId: inspectionEvent.rootId,
-      } satisfies ActorSnapshotEvent;
+      } satisfies StatelySnapshotEvent;
     }
     default: {
       throw new Error(

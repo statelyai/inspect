@@ -1,11 +1,11 @@
 import { createInspector } from './createInspector';
-import { Adapter, ActorEvents } from './types';
+import { Adapter, StatelyInspectionEvent } from './types';
 import WebSocket from 'isomorphic-ws';
 
 export class WebSocketAdapter implements Adapter {
   private ws!: WebSocket;
   private status = 'closed' as 'closed' | 'open';
-  private deferredEvents: ActorEvents[] = [];
+  private deferredEvents: StatelyInspectionEvent[] = [];
   constructor(public url: string) {}
   public start() {
     const start = () => {
@@ -45,7 +45,7 @@ export class WebSocketAdapter implements Adapter {
     this.ws.close();
     this.status = 'closed';
   }
-  public send(event: ActorEvents) {
+  public send(event: StatelyInspectionEvent) {
     if (this.status === 'open') {
       this.ws.send(JSON.stringify(event));
     } else {

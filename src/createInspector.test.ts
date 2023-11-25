@@ -1,9 +1,9 @@
 import { expect, test } from 'vitest';
 import { createInspector } from './createInspector';
-import { ActorEvents, Adapter } from './types';
+import { StatelyInspectionEvent, Adapter } from './types';
 import { createActor, createMachine } from 'xstate';
 
-function simplifyEvent(ev: ActorEvents) {
+function simplifyEvent(ev: StatelyInspectionEvent) {
   return ev.type === '@xstate.actor'
     ? { type: ev.type, sessionId: ev.sessionId }
     : ev.type === '@xstate.event'
@@ -16,7 +16,7 @@ function simplifyEvent(ev: ActorEvents) {
 }
 
 test('Creates an inspector for a state machine', async () => {
-  const events: ActorEvents[] = [];
+  const events: StatelyInspectionEvent[] = [];
   const testAdapter: Adapter = {
     send: (event) => {
       events.push(event);

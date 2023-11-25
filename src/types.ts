@@ -1,6 +1,6 @@
-import { AnyActorRef, AnyEventObject, InspectionEvent } from 'xstate';
+import { AnyActorRef, AnyEventObject, InspectionEvent, Observer } from 'xstate';
 
-export interface BaseInspectionEvent {
+export interface StatelyBaseInspectionEvent {
   // the session ID of the root
   rootId: string | undefined;
   sessionId: string;
@@ -9,52 +9,37 @@ export interface BaseInspectionEvent {
   _version: string; // version of this protocol
 }
 
-export type ActorSnapshotEvent = Pick<
+export type StatelySnapshotEvent = Pick<
   InspectionEvent & { type: '@xstate.snapshot' },
   'event' | 'rootId' | 'snapshot' | 'type'
 > &
-  BaseInspectionEvent;
+  StatelyBaseInspectionEvent;
 
-export type ActorEventEvent = Pick<
+export type StatelyEventEvent = Pick<
   InspectionEvent & { type: '@xstate.event' },
   'event' | 'rootId' | 'type'
 > & {
   // used instead of sourceRef
   sourceId: string | undefined;
-} & BaseInspectionEvent;
+} & StatelyBaseInspectionEvent;
 
-export type ActorActorEvent = Pick<
+export type StatelyActorEvent = Pick<
   InspectionEvent & { type: '@xstate.actor' },
   'type'
 > & {
   definition: string | undefined; // JSON-stringified definition or URL
   parentId: string | undefined;
-} & BaseInspectionEvent;
+} & StatelyBaseInspectionEvent;
 
-export interface ActorCommunicationEvent {
-  type: '@xstate.event';
-  event: AnyEventObject; // { type: string, ... }
-  sourceId: string | undefined; // Session ID
-  targetId: string; // Session ID, required
-}
-
-export interface ActorRegistrationEvent {
-  type: '@xstate.actor';
-  actorRef: AnyActorRef;
-  sessionId: string;
-  parentId?: string;
-  definition?: string; // JSON-stringified definition or URL
-}
-
-export type ActorEvents =
-  | ActorSnapshotEvent
-  | ActorEventEvent
-  | ActorActorEvent;
+export type StatelyInspectionEvent =
+  | StatelySnapshotEvent
+  | StatelyEventEvent
+  | StatelyActorEvent;
 
 export interface Adapter {
   start?: () => void;
   stop?: () => void;
-  send(event: ActorEvents): void;
+  send(event: StatelyInspectionEvent): void;
 }
 export interface Inspector {
   /**
@@ -99,5 +84,5 @@ export interface Inspector {
    *   inspect: inspector.inspect
    * })
    */
-  inspect: (event: InspectionEvent) => void;
+  inspect: Observer<InspectionEvent>;
 }
