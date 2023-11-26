@@ -1,12 +1,6 @@
-import {
-  AnyEventObject,
-  InspectionEvent,
-  Observer,
-  Subscribable,
-  toObserver,
-} from 'xstate';
+import { AnyEventObject, Observer, Subscribable, toObserver } from 'xstate';
 import { Inspector, StatelyInspectionEvent } from './types';
-import { createInspector } from './createInspector';
+import { InspectorOptions, createInspector } from './createInspector';
 import { BrowserAdapter } from './BrowserAdapter';
 
 interface BrowserReceiver extends Subscribable<StatelyInspectionEvent> {}
@@ -32,7 +26,7 @@ export function isStatelyInspectionEvent(
   );
 }
 
-export interface BrowserInspectorOptions {
+export interface BrowserInspectorOptions extends InspectorOptions {
   url?: string;
 }
 
@@ -48,20 +42,32 @@ export function createBrowserInspector(
   return inspector;
 }
 
-export function createBrowserReceiver(): BrowserReceiver {
+interface BrowserReceiverOptions {
+  /**
+   * The number of events from the current event to replay
+   */
+  replayCount?: number;
+}
+
+const defaultBrowserReceiverOptions: Required<BrowserReceiverOptions> = {
+  replayCount: 0,
+};
+
+export function createBrowserReceiver(
+  options?: BrowserReceiverOptions
+): BrowserReceiver {
+  const resolvedOptions = {
+    ...defaultBrowserReceiverOptions,
+    ...options,
+  };
+
   const targetWindow: Window | null =
     window.self === window.top ? window.opener : window.parent;
 
   const observers = new Set<Observer<StatelyInspectionEvent>>();
-  const deferredEvents: StatelyInspectionEvent[] = [];
 
   window.addEventListener('message', (event) => {
     if (!isStatelyInspectionEvent(event.data)) {
-      return;
-    }
-
-    if (observers.size === 0) {
-      deferredEvents.push(event.data);
       return;
     }
 

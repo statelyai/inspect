@@ -28,11 +28,19 @@ function getRootId(actorRefOrId: AnyActorRef | string): string | undefined {
   return rootActorRef ?? undefined;
 }
 
+export interface InspectorOptions {
+  filter?: (event: StatelyInspectionEvent) => boolean;
+}
+
+export const defaultInspectorOptions: Required<InspectorOptions> = {
+  filter: () => true,
+};
+
 export function createInspector(adapter: Adapter): Inspector {
   adapter.start?.();
 
   const inspector: Inspector = {
-    actor: (actorRef, info) => {
+    actor: (actorRef, snapshot, info) => {
       const sessionId =
         typeof actorRef === 'string' ? actorRef : actorRef.sessionId;
 
@@ -51,6 +59,7 @@ export function createInspector(adapter: Adapter): Inspector {
         parentId: info?.parentId,
         id: null as any,
         definition,
+        snapshot,
       } satisfies StatelyActorEvent);
     },
     event(event, { source, target }) {
@@ -117,6 +126,7 @@ export function convertXStateEvent(
         rootId: inspectionEvent.rootId,
         parentId: inspectionEvent.actorRef._parent?.sessionId,
         sessionId: inspectionEvent.actorRef.sessionId,
+        snapshot: inspectionEvent.actorRef.getSnapshot(),
       } satisfies StatelyActorEvent;
     }
     case '@xstate.event': {

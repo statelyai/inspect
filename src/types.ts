@@ -27,6 +27,7 @@ export type StatelyActorEvent = Pick<
   InspectionEvent & { type: '@xstate.actor' },
   'type'
 > & {
+  snapshot: any; // JSON snapshot
   definition: string | undefined; // JSON-stringified definition or URL
   parentId: string | undefined;
 } & StatelyBaseInspectionEvent;
@@ -41,6 +42,7 @@ export interface Adapter {
   stop?: () => void;
   send(event: StatelyInspectionEvent): void;
 }
+
 export interface Inspector {
   /**
    * Sends a snapshot inspection event. This represents the state of the actor.
@@ -64,7 +66,12 @@ export interface Inspector {
    */
   actor: (
     actorRef: AnyActorRef | string,
-    info?: { definition?: string; parentId?: string; rootId?: string }
+    snapshot: any,
+    info?: {
+      definition?: string;
+      parentId?: string;
+      rootId?: string;
+    }
   ) => void;
   /**
    * Stops the inspector.

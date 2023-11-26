@@ -5,31 +5,35 @@ export class BrowserAdapter implements Adapter {
   private status = 'closed' as 'closed' | 'open';
   private deferredEvents: StatelyInspectionEvent[] = [];
   private targetWindow: Window | null;
+  private options: Required<BrowserInspectorOptions>;
 
-  constructor(public options: BrowserInspectorOptions = {}) {
+  constructor(options: BrowserInspectorOptions = {}) {
     const resolvedOptions: Required<BrowserInspectorOptions> = {
       url: 'https://stately.ai/registry/inspect',
+      filter: () => true,
       ...options,
     };
+    this.options = resolvedOptions;
+
     this.targetWindow = window.open(
       String(resolvedOptions.url),
       'xstateinspector'
     );
   }
   public start() {
-    this.status = 'open';
-    this.deferredEvents.forEach((event) => {
-      this.targetWindow?.postMessage(event, '*');
-    });
-
     window.addEventListener('message', (event) => {
       if (
         isEventObject(event.data) &&
         event.data.type === '@statelyai.connected'
       ) {
-        this.deferredEvents.forEach((event) => {
-          this.targetWindow?.postMessage(event, '*');
-        });
+        this.status = 'open';
+        this.deferredEvents
+          .filter((event) => {
+            return event.type === '@xstate.actor';
+          })
+          .forEach((event) => {
+            this.targetWindow?.postMessage(event, '*');
+          });
       }
     });
   }
@@ -37,6 +41,11 @@ export class BrowserAdapter implements Adapter {
     this.status = 'closed';
   }
   public send(event: StatelyInspectionEvent) {
+    const shouldSendEvent = this.options.filter(event);
+    if (!shouldSendEvent) {
+      return;
+    }
+
     if (this.status === 'open') {
       this.targetWindow?.postMessage(event, '*');
     }
