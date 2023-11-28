@@ -6,7 +6,7 @@
   },
   "name": "@statelyai/inspect",
   "version": "0.0.1",
-  "description": "Inspection utilities",
+  "description": "Inspection utilities for state, actors, workflows, and state machines.",
   "main": "dist/index.js",
   "repository": "https://github.com/statelyai/inspect.git",
   "author": "David Khourshid <davidkpiano@gmail.com>",
@@ -19,5 +19,6 @@
     "build": "tsup src/index.ts --dts",
     "watch": "tsup src/index.ts --dts --watch",
     "test": "vitest"
-  }
+  },
+  "private": false
 }
