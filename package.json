@@ -19,6 +19,5 @@
     "build": "tsup src/index.ts --dts",
     "watch": "tsup src/index.ts --dts --watch",
     "test": "vitest"
-  },
-  "private": false
+  }
 }
