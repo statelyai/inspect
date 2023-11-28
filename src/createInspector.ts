@@ -43,12 +43,10 @@ export function createInspector(adapter: Adapter): Inspector {
     actor: (actorRef, snapshot, info) => {
       const sessionId =
         typeof actorRef === 'string' ? actorRef : actorRef.sessionId;
-
-      const definition =
-        info?.definition ??
-        (actorRef instanceof Actor && actorRef.logic instanceof StateMachine
-          ? JSON.stringify(actorRef.logic.definition)
-          : undefined);
+      const definitionObject = (actorRef as any)?.logic?.config;
+      const definition = definitionObject
+        ? JSON.stringify(definitionObject)
+        : undefined;
 
       adapter.send({
         type: '@xstate.actor',

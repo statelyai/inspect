@@ -27,13 +27,9 @@ export class BrowserAdapter implements Adapter {
         event.data.type === '@statelyai.connected'
       ) {
         this.status = 'open';
-        this.deferredEvents
-          .filter((event) => {
-            return event.type === '@xstate.actor';
-          })
-          .forEach((event) => {
-            this.targetWindow?.postMessage(event, '*');
-          });
+        this.deferredEvents.forEach((event) => {
+          this.targetWindow?.postMessage(event, '*');
+        });
       }
     });
   }
