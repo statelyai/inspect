@@ -4,9 +4,6 @@ dependencies:
   isomorphic-ws:
     specifier: ^5.0.0
     version: 5.0.0(ws@8.14.1)
-  ws:
-    specifier: ^8.13.0
-    version: 8.14.1
   xstate:
     specifier: 5.0.0-beta.44
     version: 5.0.0-beta.44
