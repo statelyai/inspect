@@ -2,7 +2,7 @@ import { Adapter, StatelyInspectionEvent } from './types';
 import { BrowserInspectorOptions, isEventObject } from './browser';
 
 export class BrowserAdapter implements Adapter {
-  private status = 'closed' as 'closed' | 'open';
+  private status = 'disconnected' as 'disconnected' | 'connected';
   private deferredEvents: StatelyInspectionEvent[] = [];
   private targetWindow: Window | null;
   private options: Required<BrowserInspectorOptions>;
@@ -22,11 +22,14 @@ export class BrowserAdapter implements Adapter {
   }
   public start() {
     window.addEventListener('message', (event) => {
+      if (this.status === 'connected') {
+        return;
+      }
       if (
         isEventObject(event.data) &&
         event.data.type === '@statelyai.connected'
       ) {
-        this.status = 'open';
+        this.status = 'connected';
         this.deferredEvents.forEach((event) => {
           this.targetWindow?.postMessage(event, '*');
         });
@@ -34,7 +37,7 @@ export class BrowserAdapter implements Adapter {
     });
   }
   public stop() {
-    this.status = 'closed';
+    this.status = 'disconnected';
   }
   public send(event: StatelyInspectionEvent) {
     const shouldSendEvent = this.options.filter(event);
@@ -42,7 +45,7 @@ export class BrowserAdapter implements Adapter {
       return;
     }
 
-    if (this.status === 'open') {
+    if (this.status === 'connected') {
       this.targetWindow?.postMessage(event, '*');
     }
     this.deferredEvents.push(event);
