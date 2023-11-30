@@ -51,7 +51,7 @@ export interface Adapter {
 
 export interface InspectedSnapshot {
   status: Snapshot<unknown>['status'];
-  context: any;
+  context?: any;
 }
 
 export interface Inspector<TAdapter extends Adapter> {
@@ -59,16 +59,18 @@ export interface Inspector<TAdapter extends Adapter> {
   /**
    * Sends a snapshot inspection event. This represents the state of the actor.
    */
-  snapshot: (actor: AnyActorRef | string, snapshot: InspectedSnapshot) => void;
+  snapshot: (
+    actor: AnyActorRef | string,
+    snapshot: InspectedSnapshot,
+    info?: { event?: AnyEventObject }
+  ) => void;
   /**
    * Sends an event inspection event. This represents the event that was sent to the actor.
    */
   event: (
     targetActor: AnyActorRef | string,
     event: AnyEventObject | string,
-    {
-      source,
-    }: {
+    info?: {
       source?: string;
     }
   ) => void;

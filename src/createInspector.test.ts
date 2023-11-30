@@ -12,7 +12,7 @@ function simplifyEvent(ev: StatelyInspectionEvent) {
     : {
         type: ev.type,
         sessionId: ev.sessionId,
-        snapshot: (ev.snapshot as any).value,
+        snapshot: 'value' in ev.snapshot ? ev.snapshot.value : ev.snapshot,
       };
 }
 
@@ -100,6 +100,74 @@ test('Creates an inspector for a state machine', async () => {
       res();
     }, 100);
   });
+});
+
+test('Manually inspected events', () => {
+  const events: StatelyInspectionEvent[] = [];
+  const testAdapter: Adapter = {
+    send: (event) => {
+      events.push(event);
+    },
+    start: () => {},
+    stop: () => {},
+  };
+  const inspector = createInspector(testAdapter);
+
+  inspector.actor('test');
+  inspector.actor('another', { status: 'active', context: 10 });
+  inspector.event('test', 'stringEvent');
+  inspector.event('another', { type: 'objectEvent' }, { source: 'test' });
+  inspector.snapshot('test', { status: 'active', context: 20 });
+  inspector.snapshot(
+    'another',
+    { status: 'done', context: { foo: 'bar' } },
+    { event: { type: 'objectEvent' } }
+  );
+
+  expect(events.map(simplifyEvent)).toMatchInlineSnapshot(`
+    [
+      {
+        "sessionId": "test",
+        "type": "@xstate.actor",
+      },
+      {
+        "sessionId": "another",
+        "type": "@xstate.actor",
+      },
+      {
+        "event": {
+          "type": "stringEvent",
+        },
+        "sessionId": "test",
+        "type": "@xstate.event",
+      },
+      {
+        "event": {
+          "type": "objectEvent",
+        },
+        "sessionId": "another",
+        "type": "@xstate.event",
+      },
+      {
+        "sessionId": "test",
+        "snapshot": {
+          "context": 20,
+          "status": "active",
+        },
+        "type": "@xstate.snapshot",
+      },
+      {
+        "sessionId": "another",
+        "snapshot": {
+          "context": {
+            "foo": "bar",
+          },
+          "status": "done",
+        },
+        "type": "@xstate.snapshot",
+      },
+    ]
+  `);
 });
 
 test('Inspected event includes version', () => {

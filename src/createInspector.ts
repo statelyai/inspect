@@ -72,11 +72,11 @@ export function createInspector<TAdapter extends Adapter>(
         snapshot,
       } satisfies StatelyActorEvent);
     },
-    event(target, event, { source }) {
+    event(target, event, extra) {
       const sessionId = typeof target === 'string' ? target : target.sessionId;
       adapter.send({
         type: '@xstate.event',
-        sourceId: source,
+        sourceId: extra?.source,
         sessionId,
         event: toEventObject(event),
         id: Math.random().toString(),
@@ -85,12 +85,12 @@ export function createInspector<TAdapter extends Adapter>(
         _version: pkg.version,
       });
     },
-    snapshot(actor, snapshot) {
+    snapshot(actor, snapshot, extra) {
       const sessionId = typeof actor === 'string' ? actor : actor.sessionId;
       adapter.send({
         type: '@xstate.snapshot',
         snapshot: snapshot as unknown as Snapshot<unknown>,
-        event: null as any,
+        event: extra?.event ?? (null as any),
         sessionId,
         id: null as any,
         createdAt: Date.now().toString(),
