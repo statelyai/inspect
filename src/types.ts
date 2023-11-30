@@ -33,7 +33,8 @@ export type StatelyActorEvent = Pick<
   InspectionEvent & { type: '@xstate.actor' },
   'type'
 > & {
-  snapshot: any; // JSON snapshot
+  name: string;
+  snapshot: InspectedSnapshot; // JSON snapshot
   definition: string | undefined; // JSON-stringified definition or URL
   parentId: string | undefined;
 } & StatelyBaseInspectionEvent;

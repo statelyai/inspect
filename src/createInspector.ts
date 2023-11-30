@@ -59,9 +59,11 @@ export function createInspector<TAdapter extends Adapter>(
         info?.parentId ?? typeof actorRef === 'string'
           ? undefined
           : actorRef._parent?.sessionId;
+      const name = definitionObject ? definitionObject.id : sessionId;
 
       adapter.send({
         type: '@xstate.actor',
+        name,
         sessionId,
         createdAt: Date.now().toString(),
         _version: pkg.version,
@@ -69,7 +71,7 @@ export function createInspector<TAdapter extends Adapter>(
         parentId,
         id: null as any,
         definition,
-        snapshot,
+        snapshot: snapshot ?? { status: 'active' },
       } satisfies StatelyActorEvent);
     },
     event(target, event, extra) {
@@ -128,8 +130,10 @@ export function convertXStateEvent(
             return value;
           })
         : undefined;
+      const name = definitionObject ? definitionObject.id : actorRef.sessionId;
 
       return {
+        name,
         type: '@xstate.actor',
         definition: definitionString,
         _version: '0.0.1',
