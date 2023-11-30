@@ -3,6 +3,7 @@
 The `@statelyai/inspect` package enables developers to visually inspect state transitions and actor communication in any JavaScript/TypeScript app.
 
 ## Features
+
 - Visualize state machines
 - Visualize sequence diagrams
 - Works best with XState
@@ -20,7 +21,7 @@ import { machine } from './someMachine';
 const inspector = createBrowserInspector();
 
 const actor = createActor(machine, {
-  inspect: inspector.inspect
+  inspect: inspector.inspect,
 });
 
 actor.start();
@@ -35,13 +36,27 @@ const inspector = createBrowserInspector();
 
 // ...
 
-inspector.actor('someActor', {/* initial state */});
-
-inspector.actor('anotherActor', {/* initial state */});
-
-inspector.event('someActor', { type: 'hello' }, {
-  target: 'anotherActor'
+inspector.actor('someActor', {
+  status: 'active',
+  context: {
+    /* any context data */
+  },
 });
 
-inspector.snapshot('anotherActor', {/* updated state */});
+inspector.actor('anotherActor');
+
+inspector.event(
+  'someActor',
+  { type: 'hello' },
+  {
+    target: 'anotherActor',
+  }
+);
+
+inspector.snapshot('anotherActor', {
+  status: 'active',
+  context: {
+    /* any context data */
+  },
+});
 ```
