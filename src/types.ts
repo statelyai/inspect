@@ -103,6 +103,7 @@ export interface Inspector<TAdapter extends Adapter> {
    * const actor = createActor(someMachine, {
    *   inspect: inspector.inspect
    * })
+   * ```
    */
   inspect: Observer<InspectionEvent>;
 }

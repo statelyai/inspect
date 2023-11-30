@@ -30,6 +30,10 @@ export interface BrowserInspectorOptions extends InspectorOptions {
   url?: string;
 }
 
+/**
+ * Creates a browser-based inspector that sends events to a remote inspector window.
+ * The remote inspector opens an inspector window at the specified URL by default.
+ */
 export function createBrowserInspector(
   options?: BrowserInspectorOptions
 ): Inspector<BrowserAdapter> {
