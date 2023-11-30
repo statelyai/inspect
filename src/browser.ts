@@ -32,7 +32,7 @@ export interface BrowserInspectorOptions extends InspectorOptions {
 
 export function createBrowserInspector(
   options?: BrowserInspectorOptions
-): Inspector {
+): Inspector<BrowserAdapter> {
   const adapter = new BrowserAdapter(options);
 
   adapter.start();

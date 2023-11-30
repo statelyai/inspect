@@ -2,6 +2,7 @@ import { expect, test } from 'vitest';
 import { createInspector } from './createInspector';
 import { StatelyInspectionEvent, Adapter } from './types';
 import { createActor, createMachine } from 'xstate';
+import pkg from '../package.json';
 
 function simplifyEvent(ev: StatelyInspectionEvent) {
   return ev.type === '@xstate.actor'
@@ -99,4 +100,20 @@ test('Creates an inspector for a state machine', async () => {
       res();
     }, 100);
   });
+});
+
+test('Inspected event includes version', () => {
+  const events: StatelyInspectionEvent[] = [];
+  const testAdapter: Adapter = {
+    send: (event) => {
+      events.push(event);
+    },
+    start: () => {},
+    stop: () => {},
+  };
+  const inspector = createInspector(testAdapter);
+
+  inspector.actor('test');
+
+  expect(events[0]._version).toEqual(pkg.version);
 });

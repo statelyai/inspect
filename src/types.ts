@@ -1,4 +1,10 @@
-import { AnyActorRef, AnyEventObject, InspectionEvent, Observer } from 'xstate';
+import {
+  AnyActorRef,
+  AnyEventObject,
+  InspectionEvent,
+  Observer,
+  Snapshot,
+} from 'xstate';
 
 export interface StatelyBaseInspectionEvent {
   // the session ID of the root
@@ -43,30 +49,35 @@ export interface Adapter {
   send(event: StatelyInspectionEvent): void;
 }
 
-export interface Inspector {
+export interface InspectedSnapshot {
+  status: Snapshot<unknown>['status'];
+  context: any;
+}
+
+export interface Inspector<TAdapter extends Adapter> {
+  adapter: TAdapter;
   /**
    * Sends a snapshot inspection event. This represents the state of the actor.
    */
-  snapshot: (sessionId: string, snapshot: any) => void;
+  snapshot: (actor: AnyActorRef | string, snapshot: InspectedSnapshot) => void;
   /**
    * Sends an event inspection event. This represents the event that was sent to the actor.
    */
   event: (
+    targetActor: AnyActorRef | string,
     event: AnyEventObject | string,
     {
       source,
-      target,
     }: {
       source?: string;
-      target: string;
     }
   ) => void;
   /**
    * Sends an actor registration inspection event. This represents the actor that was created.
    */
   actor: (
-    actorRef: AnyActorRef | string,
-    snapshot: any,
+    actor: AnyActorRef | string,
+    snapshot?: InspectedSnapshot,
     info?: {
       definition?: string;
       parentId?: string;

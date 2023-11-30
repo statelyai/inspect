@@ -4,7 +4,7 @@ import { BrowserInspectorOptions, isEventObject } from './browser';
 export class BrowserAdapter implements Adapter {
   private status = 'disconnected' as 'disconnected' | 'connected';
   private deferredEvents: StatelyInspectionEvent[] = [];
-  private targetWindow: Window | null;
+  public targetWindow: Window | null;
   private options: Required<BrowserInspectorOptions>;
 
   constructor(options: BrowserInspectorOptions = {}) {

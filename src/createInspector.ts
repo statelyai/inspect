@@ -7,7 +7,8 @@ import {
 } from './types';
 import { toEventObject } from './utils';
 import { Inspector } from './types';
-import { Actor, AnyActorRef, InspectionEvent, StateMachine } from 'xstate';
+import { AnyActorRef, InspectionEvent, Snapshot } from 'xstate';
+import pkg from '../package.json';
 
 function getRoot(actorRef: AnyActorRef) {
   let marker: AnyActorRef | undefined = actorRef;
@@ -36,10 +37,13 @@ export const defaultInspectorOptions: Required<InspectorOptions> = {
   filter: () => true,
 };
 
-export function createInspector(adapter: Adapter): Inspector {
+export function createInspector<TAdapter extends Adapter>(
+  adapter: TAdapter
+): Inspector<TAdapter> {
   adapter.start?.();
 
-  const inspector: Inspector = {
+  const inspector: Inspector<TAdapter> = {
+    adapter,
     actor: (actorRef, snapshot, info) => {
       const sessionId =
         typeof actorRef === 'string' ? actorRef : actorRef.sessionId;
@@ -47,41 +51,51 @@ export function createInspector(adapter: Adapter): Inspector {
       const definition = definitionObject
         ? JSON.stringify(definitionObject)
         : undefined;
+      const rootId =
+        info?.rootId ?? typeof actorRef === 'string'
+          ? undefined
+          : getRootId(actorRef);
+      const parentId =
+        info?.parentId ?? typeof actorRef === 'string'
+          ? undefined
+          : actorRef._parent?.sessionId;
 
       adapter.send({
         type: '@xstate.actor',
         sessionId,
         createdAt: Date.now().toString(),
-        _version: '0.0.1',
-        rootId: info?.rootId,
-        parentId: info?.parentId,
+        _version: pkg.version,
+        rootId,
+        parentId,
         id: null as any,
         definition,
         snapshot,
       } satisfies StatelyActorEvent);
     },
-    event(event, { source, target }) {
+    event(target, event, { source }) {
+      const sessionId = typeof target === 'string' ? target : target.sessionId;
       adapter.send({
         type: '@xstate.event',
         sourceId: source,
-        sessionId: target,
+        sessionId,
         event: toEventObject(event),
         id: Math.random().toString(),
         createdAt: Date.now().toString(),
         rootId: 'anonymous',
-        _version: '0.0.1',
+        _version: pkg.version,
       });
     },
-    snapshot(sessionId, snapshot) {
+    snapshot(actor, snapshot) {
+      const sessionId = typeof actor === 'string' ? actor : actor.sessionId;
       adapter.send({
         type: '@xstate.snapshot',
-        snapshot,
+        snapshot: snapshot as unknown as Snapshot<unknown>,
         event: null as any,
         sessionId,
         id: null as any,
         createdAt: Date.now().toString(),
         rootId: 'anonymous',
-        _version: '0.0.1',
+        _version: pkg.version,
       });
     },
     inspect: {
