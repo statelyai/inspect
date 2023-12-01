@@ -1,12 +1,15 @@
 lockfileVersion: '6.0'
 
 dependencies:
+  fast-safe-stringify:
+    specifier: ^2.1.1
+    version: registry.npmjs.org/fast-safe-stringify@2.1.1
   isomorphic-ws:
     specifier: ^5.0.0
     version: 5.0.0(ws@8.14.2)
   xstate:
-    specifier: 5.0.0-beta.44
-    version: 5.0.0-beta.44
+    specifier: 5.0.0-beta.53
+    version: registry.npmjs.org/xstate@5.0.0-beta.53
 
 devDependencies:
   '@changesets/cli':
@@ -1068,10 +1071,6 @@ packages:
   /wrappy@1.0.2:
     resolution: {integrity: sha512-l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==}
     dev: true
-
-  /xstate@5.0.0-beta.44:
-    resolution: {integrity: sha512-cqYg51v1UrWRDoho/EolyEu85YyzaS+tI3C+VJUuSId6++WwrT6NiVxolG5cd0uG5jyjB3+Xje7erfYIQOcpLw==}
-    dev: false
 
   /yaml@2.3.2:
     resolution: {integrity: sha512-N/lyzTPaJasoDmfV7YTrYCI0G/3ivm/9wdG0aHuheKowWQwGTsK0Eoiw6utmzAnI6pkJa0DUVygvp3spqqEKXg==}
@@ -2263,6 +2262,12 @@ packages:
       merge2: registry.npmjs.org/merge2@1.4.1
       micromatch: registry.npmjs.org/micromatch@4.0.5
     dev: true
+
+  registry.npmjs.org/fast-safe-stringify@2.1.1:
+    resolution: {integrity: sha512-W+KJc2dmILlPplD/H4K9l9LcAHAfPtP6BY84uVLXQ6Evcz9Lcg33Y2z1IVblT6xdY54PXYVHEv+0Wpq8Io6zkA==, registry: https://registry.npmjs.com/, tarball: https://registry.npmjs.org/fast-safe-stringify/-/fast-safe-stringify-2.1.1.tgz}
+    name: fast-safe-stringify
+    version: 2.1.1
+    dev: false
 
   registry.npmjs.org/fastq@1.15.0:
     resolution: {integrity: sha512-wBrocU2LCXXa+lWBt8RoIRD89Fi8OdABODa/kEnyeyjS5aZO5/GNvI5sEINADqP/h8M29UHTHUb53sUu5Ihqdw==, registry: https://registry.npmjs.com/, tarball: https://registry.npmjs.org/fastq/-/fastq-1.15.0.tgz}
@@ -4049,6 +4054,12 @@ packages:
     name: xmlchars
     version: 2.2.0
     dev: true
+
+  registry.npmjs.org/xstate@5.0.0-beta.53:
+    resolution: {integrity: sha512-ioa28EXhKUPzaEyvPM9Sg1V0mQpp2EC45TgbpCbQeH54Qg4tIamHFf3ed/V3UQ8IAzZN0Ba4gvlEsUdG2HOn4Q==, registry: https://registry.npmjs.com/, tarball: https://registry.npmjs.org/xstate/-/xstate-5.0.0-beta.53.tgz}
+    name: xstate
+    version: 5.0.0-beta.53
+    dev: false
 
   registry.npmjs.org/y18n@4.0.3:
     resolution: {integrity: sha512-JKhqTOwSrqNA1NY5lSztJ1GrBiUodLMmIZuLiDaMRJ+itFd+ABVE8XBjOvIWL+rSqNDC74LCSFmlb/U4UZ4hJQ==, registry: https://registry.npmjs.com/, tarball: https://registry.npmjs.org/y18n/-/y18n-4.0.3.tgz}

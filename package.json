@@ -15,8 +15,9 @@
   "author": "David Khourshid <davidkpiano@gmail.com>",
   "license": "MIT",
   "dependencies": {
+    "fast-safe-stringify": "^2.1.1",
     "isomorphic-ws": "^5.0.0",
-    "xstate": "5.0.0-beta.44"
+    "xstate": "5.0.0-beta.53"
   },
   "scripts": {
     "build": "tsup src/index.ts --dts",

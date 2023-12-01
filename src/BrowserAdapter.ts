@@ -1,5 +1,6 @@
 import { Adapter, StatelyInspectionEvent } from './types';
 import { BrowserInspectorOptions, isEventObject } from './browser';
+import safeStringify from 'fast-safe-stringify';
 
 export class BrowserAdapter implements Adapter {
   private status = 'disconnected' as 'disconnected' | 'connected';
@@ -11,6 +12,7 @@ export class BrowserAdapter implements Adapter {
     const resolvedOptions: Required<BrowserInspectorOptions> = {
       url: 'https://stately.ai/registry/inspect',
       filter: () => true,
+      serialize: (event) => JSON.parse(safeStringify(event)),
       ...options,
     };
     this.options = resolvedOptions;
@@ -31,7 +33,8 @@ export class BrowserAdapter implements Adapter {
       ) {
         this.status = 'connected';
         this.deferredEvents.forEach((event) => {
-          this.targetWindow?.postMessage(event, '*');
+          const serializedEvent = this.options.serialize(event);
+          this.targetWindow?.postMessage(serializedEvent, '*');
         });
       }
     });
@@ -46,7 +49,8 @@ export class BrowserAdapter implements Adapter {
     }
 
     if (this.status === 'connected') {
-      this.targetWindow?.postMessage(event, '*');
+      const serializedEvent = this.options.serialize(event);
+      this.targetWindow?.postMessage(serializedEvent, '*');
     }
     this.deferredEvents.push(event);
   }

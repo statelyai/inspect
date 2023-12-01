@@ -1,6 +1,6 @@
 import { expect, test } from 'vitest';
 import { createActor, createMachine } from 'xstate';
-import { createBrowserInspector } from './browser';
+import { createBrowserInspector } from './';
 import { StatelyActorEvent } from './types';
 import { JSDOM } from 'jsdom';
 
