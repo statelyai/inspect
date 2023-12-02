@@ -73,7 +73,7 @@ test('Creates an inspector for a state machine', async () => {
           },
           {
             "event": {
-              "type": "xstate.after(10)#trafficLight.green",
+              "type": "xstate.after.10.trafficLight.green",
             },
             "sessionId": "x:0",
             "type": "@xstate.event",
@@ -85,7 +85,7 @@ test('Creates an inspector for a state machine', async () => {
           },
           {
             "event": {
-              "type": "xstate.after(10)#trafficLight.yellow",
+              "type": "xstate.after.10.trafficLight.yellow",
             },
             "sessionId": "x:0",
             "type": "@xstate.event",

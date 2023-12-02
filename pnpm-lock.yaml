@@ -8,8 +8,8 @@ dependencies:
     specifier: ^5.0.0
     version: 5.0.0(ws@8.14.2)
   xstate:
-    specifier: 5.0.0-beta.53
-    version: registry.npmjs.org/xstate@5.0.0-beta.53
+    specifier: 5.0.0
+    version: registry.npmjs.org/xstate@5.0.0
 
 devDependencies:
   '@changesets/cli':
@@ -4055,10 +4055,10 @@ packages:
     version: 2.2.0
     dev: true
 
-  registry.npmjs.org/xstate@5.0.0-beta.53:
-    resolution: {integrity: sha512-ioa28EXhKUPzaEyvPM9Sg1V0mQpp2EC45TgbpCbQeH54Qg4tIamHFf3ed/V3UQ8IAzZN0Ba4gvlEsUdG2HOn4Q==, registry: https://registry.npmjs.com/, tarball: https://registry.npmjs.org/xstate/-/xstate-5.0.0-beta.53.tgz}
+  registry.npmjs.org/xstate@5.0.0:
+    resolution: {integrity: sha512-FIKtRv8eQB+3dRLdnzdxlQ/sRjcqiN31JaskeHbcyRBaEvcwcjbakYZ5PVV9v4K0szbe793SUN/04J6/g5GrEA==, registry: https://registry.npmjs.com/, tarball: https://registry.npmjs.org/xstate/-/xstate-5.0.0.tgz}
     name: xstate
-    version: 5.0.0-beta.53
+    version: 5.0.0
     dev: false
 
   registry.npmjs.org/y18n@4.0.3:
