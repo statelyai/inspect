@@ -8,7 +8,7 @@
     "vitest": "^0.34.6"
   },
   "name": "@statelyai/inspect",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Inspection utilities for state, actors, workflows, and state machines.",
   "main": "dist/index.js",
   "repository": "https://github.com/statelyai/inspect.git",
