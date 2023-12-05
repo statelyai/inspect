@@ -40,6 +40,7 @@ export class BrowserAdapter implements Adapter {
     });
   }
   public stop() {
+    this.targetWindow?.postMessage({ type: '@statelyai.disconnected' }, '*');
     this.status = 'disconnected';
   }
   public send(event: StatelyInspectionEvent) {
