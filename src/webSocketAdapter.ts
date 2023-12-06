@@ -1,15 +1,28 @@
-import { createInspector } from './createInspector';
+import { InspectorOptions, createInspector } from './createInspector';
 import { Adapter, StatelyInspectionEvent } from './types';
 import WebSocket from 'isomorphic-ws';
+import safeStringify from 'fast-safe-stringify';
+
+export interface WebSocketAdapterOptions extends InspectorOptions {
+  url: string;
+}
 
 export class WebSocketAdapter implements Adapter {
   private ws!: WebSocket;
   private status = 'closed' as 'closed' | 'open';
   private deferredEvents: StatelyInspectionEvent[] = [];
-  constructor(public url: string) {}
+  private options: Required<WebSocketAdapterOptions>;
+
+  constructor(options: WebSocketAdapterOptions) {
+    this.options = {
+      filter: () => true,
+      serialize: (event) => JSON.parse(safeStringify(event)),
+      ...options,
+    };
+  }
   public start() {
     const start = () => {
-      this.ws = new WebSocket(this.url);
+      this.ws = new WebSocket(this.options.url);
 
       this.ws.onopen = () => {
         console.log('websocket open');
@@ -55,7 +68,7 @@ export class WebSocketAdapter implements Adapter {
 }
 
 export function createWebSocketInspector(url: string) {
-  const adapter = new WebSocketAdapter(url);
+  const adapter = new WebSocketAdapter({ url });
 
   const inspector = createInspector(adapter);
 

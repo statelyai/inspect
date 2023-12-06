@@ -28,6 +28,7 @@ export function isStatelyInspectionEvent(
 
 export interface BrowserInspectorOptions extends InspectorOptions {
   url?: string;
+  window?: Window;
 }
 
 /**
@@ -38,15 +39,16 @@ export function createBrowserInspector(
   options?: BrowserInspectorOptions
 ): Inspector<BrowserAdapter> {
   const adapter = new BrowserAdapter(options);
-
-  adapter.start();
-
   const inspector = createInspector(adapter);
+
+  // Start immediately
+  inspector.start();
 
   return inspector;
 }
 
 interface BrowserReceiverOptions {
+  window?: Window;
   /**
    * The number of events from the current event to replay
    */
@@ -55,6 +57,7 @@ interface BrowserReceiverOptions {
 
 const defaultBrowserReceiverOptions: Required<BrowserReceiverOptions> = {
   replayCount: 0,
+  window: typeof window !== 'undefined' ? window : (undefined as any),
 };
 
 export function createBrowserReceiver(
@@ -65,12 +68,16 @@ export function createBrowserReceiver(
     ...options,
   };
 
+  const browserWindow = resolvedOptions.window;
+
   const targetWindow: Window | null =
-    window.self === window.top ? window.opener : window.parent;
+    browserWindow.self === browserWindow.top
+      ? browserWindow.opener
+      : browserWindow.parent;
 
   const observers = new Set<Observer<StatelyInspectionEvent>>();
 
-  window.addEventListener('message', (event) => {
+  browserWindow.addEventListener('message', (event) => {
     if (!isStatelyInspectionEvent(event.data)) {
       return;
     }

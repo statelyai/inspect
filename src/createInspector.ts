@@ -42,8 +42,6 @@ export const defaultInspectorOptions: Required<InspectorOptions> = {
 export function createInspector<TAdapter extends Adapter>(
   adapter: TAdapter
 ): Inspector<TAdapter> {
-  adapter.start?.();
-
   const inspector: Inspector<TAdapter> = {
     adapter,
     actor: (actorRef, snapshot, info) => {
@@ -107,6 +105,9 @@ export function createInspector<TAdapter extends Adapter>(
         const convertedEvent = convertXStateEvent(event);
         adapter.send(convertedEvent);
       },
+    },
+    start() {
+      adapter.start?.();
     },
     stop() {
       adapter.stop?.();

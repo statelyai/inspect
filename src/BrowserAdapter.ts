@@ -5,7 +5,7 @@ import safeStringify from 'fast-safe-stringify';
 export class BrowserAdapter implements Adapter {
   private status = 'disconnected' as 'disconnected' | 'connected';
   private deferredEvents: StatelyInspectionEvent[] = [];
-  public targetWindow: Window | null;
+  public targetWindow: Window | null = null;
   private options: Required<BrowserInspectorOptions>;
 
   constructor(options: BrowserInspectorOptions = {}) {
@@ -14,19 +14,17 @@ export class BrowserAdapter implements Adapter {
       filter: () => true,
       serialize: (event) => JSON.parse(safeStringify(event)),
       ...options,
+      window: options.window ?? window,
     };
     this.options = resolvedOptions;
-
-    this.targetWindow = window.open(
-      String(resolvedOptions.url),
-      'xstateinspector'
-    );
   }
   public start() {
-    window.addEventListener('message', (event) => {
-      if (this.status === 'connected') {
-        return;
-      }
+    this.targetWindow = this.options.window.open(
+      String(this.options.url),
+      'xstateinspector'
+    );
+
+    this.options.window.addEventListener('message', (event) => {
       if (
         isEventObject(event.data) &&
         event.data.type === '@statelyai.connected'

@@ -88,6 +88,10 @@ export interface Inspector<TAdapter extends Adapter> {
     }
   ) => void;
   /**
+   * Starts the inspector.
+   */
+  start: () => void;
+  /**
    * Stops the inspector.
    */
   stop: () => void;

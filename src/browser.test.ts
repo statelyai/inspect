@@ -6,7 +6,6 @@ import { JSDOM } from 'jsdom';
 
 test('Inspector observes a state machine', async () => {
   const dom = new JSDOM();
-  (globalThis as any).window = dom.window;
 
   const events: StatelyActorEvent[] = [];
 
@@ -28,7 +27,9 @@ test('Inspector observes a state machine', async () => {
     },
   });
 
-  const inspector = createBrowserInspector();
+  const inspector = createBrowserInspector({
+    window: dom.window as any as Window,
+  });
   inspector.adapter.targetWindow = new JSDOM().window as any;
 
   inspector.adapter.targetWindow!.addEventListener('message', (event) => {
@@ -41,7 +42,7 @@ test('Inspector observes a state machine', async () => {
   trafficLightActor.start();
 
   // simulate getting an event from the inspector
-  window.postMessage(
+  dom.window.postMessage(
     {
       type: '@statelyai.connected',
     },
