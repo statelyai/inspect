@@ -9,6 +9,7 @@ import { toEventObject } from './utils';
 import { Inspector } from './types';
 import { AnyActorRef, InspectionEvent, Snapshot } from 'xstate';
 import pkg from '../package.json';
+import { idleCallback } from './idleCallback';
 
 function getRoot(actorRef: AnyActorRef) {
   let marker: AnyActorRef | undefined = actorRef;
@@ -102,8 +103,10 @@ export function createInspector<TAdapter extends Adapter>(
     },
     inspect: {
       next: (event) => {
-        const convertedEvent = convertXStateEvent(event);
-        adapter.send(convertedEvent);
+        idleCallback(function inspectNext() {
+          const convertedEvent = convertXStateEvent(event);
+          adapter.send(convertedEvent);
+        });
       },
     },
     start() {
@@ -123,23 +126,32 @@ export function convertXStateEvent(
   switch (inspectionEvent.type) {
     case '@xstate.actor': {
       const actorRef = inspectionEvent.actorRef;
-      const definitionObject = (actorRef as any)?.logic?.config;
-      const definitionString = definitionObject
-        ? JSON.stringify(definitionObject, (key, value) => {
-            if (typeof value === 'function') {
-              return { type: value.name };
-            }
+      const logic = (actorRef as any)?.logic;
+      const definitionObject = logic?.config;
+      let name = actorRef.id;
 
-            return value;
-          })
-        : undefined;
-      const name = definitionObject ? definitionObject.id : actorRef.sessionId;
+      // TODO: fix this in XState
+      if (name === actorRef.sessionId && definitionObject) {
+        name = definitionObject.id;
+      }
+      const definitionString =
+        typeof definitionObject === 'object'
+          ? JSON.stringify(definitionObject, (key, value) => {
+              if (typeof value === 'function') {
+                return { type: value.name };
+              }
+
+              return value;
+            })
+          : JSON.stringify({
+              id: name,
+            });
 
       return {
         name,
         type: '@xstate.actor',
         definition: definitionString,
-        _version: '0.0.1',
+        _version: pkg.version,
         createdAt: Date.now().toString(),
         id: null as any,
         rootId: inspectionEvent.rootId,
@@ -155,7 +167,7 @@ export function convertXStateEvent(
         sourceId: inspectionEvent.sourceRef?.sessionId,
         // sessionId: inspectionEvent.targetRef.sessionId,
         sessionId: inspectionEvent.actorRef.sessionId,
-        _version: '0.0.1',
+        _version: pkg.version,
         createdAt: Date.now().toString(),
         id: null as any,
         rootId: inspectionEvent.rootId,
@@ -167,7 +179,7 @@ export function convertXStateEvent(
         event: inspectionEvent.event,
         snapshot: JSON.parse(JSON.stringify(inspectionEvent.snapshot)),
         sessionId: inspectionEvent.actorRef.sessionId,
-        _version: '0.0.1',
+        _version: pkg.version,
         createdAt: Date.now().toString(),
         id: null as any,
         rootId: inspectionEvent.rootId,
