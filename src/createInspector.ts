@@ -45,7 +45,8 @@ export function createInspector<TAdapter extends Adapter>(
 ): Inspector<TAdapter> {
   const inspector: Inspector<TAdapter> = {
     adapter,
-    actor: (actorRef, snapshot, info) => {
+    actor: (info) => {
+      const actorRef = info.actor;
       const sessionId =
         typeof actorRef === 'string' ? actorRef : actorRef.sessionId;
       const definitionObject = (actorRef as any)?.logic?.config;
@@ -72,28 +73,35 @@ export function createInspector<TAdapter extends Adapter>(
         parentId,
         id: null as any,
         definition,
-        snapshot: snapshot ?? { status: 'active' },
+        snapshot: info.snapshot ?? { status: 'active' },
       } satisfies StatelyActorEvent);
     },
-    event(target, event, extra) {
-      const sessionId = typeof target === 'string' ? target : target.sessionId;
+    event(info) {
+      const sessionId =
+        typeof info.target === 'string' ? info.target : info.target.sessionId;
+      const sourceId = !info.source
+        ? undefined
+        : typeof info.source === 'string'
+        ? info.source
+        : info.source.sessionId;
       adapter.send({
         type: '@xstate.event',
-        sourceId: extra?.source,
+        sourceId,
         sessionId,
-        event: toEventObject(event),
+        event: toEventObject(info.event),
         id: Math.random().toString(),
         createdAt: Date.now().toString(),
         rootId: 'anonymous',
         _version: pkg.version,
       });
     },
-    snapshot(actor, snapshot, extra) {
-      const sessionId = typeof actor === 'string' ? actor : actor.sessionId;
+    snapshot(info) {
+      const sessionId =
+        typeof info.actor === 'string' ? info.actor : info.actor.sessionId;
       adapter.send({
         type: '@xstate.snapshot',
-        snapshot: snapshot as unknown as Snapshot<unknown>,
-        event: extra?.event ?? (null as any),
+        snapshot: info.snapshot as unknown as Snapshot<unknown>,
+        event: info.event ?? (null as any),
         sessionId,
         id: null as any,
         createdAt: Date.now().toString(),

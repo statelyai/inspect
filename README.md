@@ -36,27 +36,31 @@ const inspector = createBrowserInspector();
 
 // ...
 
-inspector.actor('someActor', {
-  status: 'active',
-  context: {
-    /* any context data */
+inspector.actor({
+  actor: 'someActor',
+  snapshot: {
+    status: 'active',
+    context: {
+      /* any context data */
+    },
   },
 });
 
-inspector.actor('anotherActor');
+inspector.actor({ actor: 'anotherActor' });
 
-inspector.event(
-  'someActor',
-  { type: 'hello' },
-  {
-    target: 'anotherActor',
-  }
-);
+inspector.event({
+  target: 'someActor',
+  event: { type: 'hello' },
+  source: 'anotherActor',
+});
 
-inspector.snapshot('anotherActor', {
-  status: 'active',
-  context: {
-    /* any context data */
+inspector.snapshot({
+  actor: 'anotherActor',
+  snapshot: {
+    status: 'active',
+    context: {
+      /* any context data */
+    },
   },
 });
 ```

@@ -113,16 +113,26 @@ test('Manually inspected events', () => {
   };
   const inspector = createInspector(testAdapter);
 
-  inspector.actor('test');
-  inspector.actor('another', { status: 'active', context: 10 });
-  inspector.event('test', 'stringEvent');
-  inspector.event('another', { type: 'objectEvent' }, { source: 'test' });
-  inspector.snapshot('test', { status: 'active', context: 20 });
-  inspector.snapshot(
-    'another',
-    { status: 'done', context: { foo: 'bar' } },
-    { event: { type: 'objectEvent' } }
-  );
+  inspector.actor({ actor: 'test' });
+  inspector.actor({
+    actor: 'another',
+    snapshot: { status: 'active', context: 10 },
+  });
+  inspector.event({ target: 'test', event: 'stringEvent' });
+  inspector.event({
+    target: 'another',
+    event: { type: 'objectEvent' },
+    source: 'test',
+  });
+  inspector.snapshot({
+    actor: 'test',
+    snapshot: { status: 'active', context: 20 },
+  });
+  inspector.snapshot({
+    actor: 'another',
+    snapshot: { status: 'done', context: { foo: 'bar' } },
+    event: { type: 'objectEvent' },
+  });
 
   expect(events.map(simplifyEvent)).toMatchInlineSnapshot(`
     [
@@ -181,7 +191,7 @@ test('Inspected event includes version', () => {
   };
   const inspector = createInspector(testAdapter);
 
-  inspector.actor('test');
+  inspector.actor({ actor: 'test' });
 
   expect(events[0]._version).toEqual(pkg.version);
 });

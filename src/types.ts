@@ -60,33 +60,43 @@ export interface Inspector<TAdapter extends Adapter> {
   /**
    * Sends a snapshot inspection event. This represents the state of the actor.
    */
-  snapshot: (
-    actor: AnyActorRef | string,
-    snapshot: InspectedSnapshot,
-    info?: { event?: AnyEventObject }
-  ) => void;
+  snapshot: ({
+    actor,
+    snapshot,
+    event,
+  }: {
+    actor: AnyActorRef | string;
+    snapshot: InspectedSnapshot;
+    event?: AnyEventObject;
+  }) => void;
   /**
    * Sends an event inspection event. This represents the event that was sent to the actor.
    */
-  event: (
-    targetActor: AnyActorRef | string,
-    event: AnyEventObject | string,
-    info?: {
-      source?: string;
-    }
-  ) => void;
+  event: ({
+    target,
+    event,
+    source,
+  }: {
+    target: AnyActorRef | string;
+    event: AnyEventObject | string;
+    source?: AnyActorRef | string;
+  }) => void;
   /**
    * Sends an actor registration inspection event. This represents the actor that was created.
    */
-  actor: (
-    actor: AnyActorRef | string,
-    snapshot?: InspectedSnapshot,
-    info?: {
-      definition?: string;
-      parentId?: string;
-      rootId?: string;
-    }
-  ) => void;
+  actor: ({
+    actor,
+    snapshot,
+    definition,
+    parentId,
+    rootId,
+  }: {
+    actor: AnyActorRef | string;
+    snapshot?: InspectedSnapshot;
+    definition?: string;
+    parentId?: string;
+    rootId?: string;
+  }) => void;
   /**
    * Starts the inspector.
    */
