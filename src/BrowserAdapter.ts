@@ -27,8 +27,8 @@ export class BrowserAdapter implements Adapter {
     if (this.options.iframe) {
       this.options.iframe.addEventListener('load', () => {
         this.targetWindow = this.options.iframe?.contentWindow ?? null;
-        this.options.iframe?.setAttribute('src', String(this.options.url));
       });
+      this.options.iframe?.setAttribute('src', String(this.options.url));
     }
 
     this.options.window.addEventListener('message', (event) => {
