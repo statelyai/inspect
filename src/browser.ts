@@ -29,6 +29,7 @@ export function isStatelyInspectionEvent(
 export interface BrowserInspectorOptions extends InspectorOptions {
   url?: string;
   window?: Window;
+  iframe?: HTMLIFrameElement | null;
 }
 
 /**

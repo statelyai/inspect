@@ -13,16 +13,23 @@ export class BrowserAdapter implements Adapter {
       url: 'https://stately.ai/registry/inspect',
       filter: () => true,
       serialize: (event) => JSON.parse(safeStringify(event)),
+      iframe: null,
       ...options,
       window: options.window ?? window,
     };
     this.options = resolvedOptions;
   }
   public start() {
-    this.targetWindow = this.options.window.open(
-      String(this.options.url),
-      'xstateinspector'
-    );
+    this.targetWindow = this.options.iframe
+      ? null
+      : this.options.window.open(String(this.options.url), 'xstateinspector');
+
+    if (this.options.iframe) {
+      this.options.iframe.addEventListener('load', () => {
+        this.targetWindow = this.options.iframe?.contentWindow ?? null;
+        this.options.iframe?.setAttribute('src', String(this.options.url));
+      });
+    }
 
     this.options.window.addEventListener('message', (event) => {
       if (
