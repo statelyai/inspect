@@ -2,21 +2,24 @@ import { InspectorOptions, createInspector } from './createInspector';
 import { Adapter, StatelyInspectionEvent } from './types';
 import WebSocket from 'isomorphic-ws';
 import safeStringify from 'fast-safe-stringify';
+import { Observer, Subscribable, toObserver } from 'xstate';
 
-export interface WebSocketAdapterOptions extends InspectorOptions {
+export interface WebSocketInspectorOptions extends InspectorOptions {
   url: string;
 }
 
 export class WebSocketAdapter implements Adapter {
-  private ws!: WebSocket;
+  private ws: WebSocket;
   private status = 'closed' as 'closed' | 'open';
   private deferredEvents: StatelyInspectionEvent[] = [];
-  private options: Required<WebSocketAdapterOptions>;
+  private options: Required<WebSocketInspectorOptions>;
 
-  constructor(options: WebSocketAdapterOptions) {
+  constructor(options?: WebSocketInspectorOptions) {
     this.options = {
       filter: () => true,
       serialize: (event) => JSON.parse(safeStringify(event)),
+      autoStart: true,
+      url: 'ws://localhost:8080',
       ...options,
     };
   }
@@ -67,10 +70,56 @@ export class WebSocketAdapter implements Adapter {
   }
 }
 
-export function createWebSocketInspector(url: string) {
-  const adapter = new WebSocketAdapter({ url });
+export function createWebSocketInspector(options?: WebSocketInspectorOptions) {
+  const adapter = new WebSocketAdapter(options);
 
   const inspector = createInspector(adapter);
 
   return inspector;
+}
+
+interface WebSocketReceiver extends Subscribable<StatelyInspectionEvent> {}
+
+export function createWebSocketReceiver(options?: {
+  server: string;
+}): WebSocketReceiver {
+  const resolvedOptions = {
+    server: 'ws://localhost:8080',
+    ...options,
+  };
+
+  const observers = new Set<Observer<StatelyInspectionEvent>>();
+
+  const ws = new WebSocket(resolvedOptions.server);
+
+  ws.onopen = () => {
+    console.log('websocket open');
+
+    ws.onmessage = (event: { data: unknown }) => {
+      if (typeof event.data !== 'string') {
+        return;
+      }
+      console.log('message', event.data);
+      const eventData = JSON.parse(event.data);
+
+      observers.forEach((observer) => {
+        observer.next?.(eventData);
+      });
+    };
+  };
+
+  const receiver: WebSocketReceiver = {
+    subscribe(observerOrFn) {
+      const observer = toObserver(observerOrFn);
+      observers.add(observer);
+
+      return {
+        unsubscribe() {
+          observers.delete(observer);
+        },
+      };
+    },
+  };
+
+  return receiver;
 }

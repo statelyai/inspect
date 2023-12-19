@@ -33,11 +33,18 @@ function getRootId(actorRefOrId: AnyActorRef | string): string | undefined {
 export interface InspectorOptions {
   filter?: (event: StatelyInspectionEvent) => boolean;
   serialize?: (event: StatelyInspectionEvent) => StatelyInspectionEvent;
+  /**
+   * Whether to automatically start the inspector.
+   *
+   * @default true
+   */
+  autoStart?: boolean;
 }
 
 export const defaultInspectorOptions: Required<InspectorOptions> = {
   filter: () => true,
   serialize: (event) => event,
+  autoStart: true,
 };
 
 export function createInspector<TAdapter extends Adapter>(

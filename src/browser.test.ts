@@ -4,7 +4,7 @@ import { createBrowserInspector } from './';
 import { StatelyActorEvent } from './types';
 import { JSDOM } from 'jsdom';
 
-test('Inspector observes a state machine', async () => {
+test('inspector observes a state machine', async () => {
   const dom = new JSDOM();
 
   const events: StatelyActorEvent[] = [];

@@ -1,5 +1,5 @@
 export { createInspector } from './createInspector';
-export { createWebSocketInspector } from './webSocketAdapter';
+export { createWebSocketInspector, createWebSocketReceiver } from './webSocket';
 export { createBrowserInspector, createBrowserReceiver } from './browser';
 export type {
   StatelyActorEvent,

@@ -1,7 +1,7 @@
 import { AnyEventObject, Observer, Subscribable, toObserver } from 'xstate';
-import { Inspector, StatelyInspectionEvent } from './types';
+import { Adapter, Inspector, StatelyInspectionEvent } from './types';
 import { InspectorOptions, createInspector } from './createInspector';
-import { BrowserAdapter } from './BrowserAdapter';
+import safeStringify from 'fast-safe-stringify';
 
 interface BrowserReceiver extends Subscribable<StatelyInspectionEvent> {}
 
@@ -39,11 +39,22 @@ export interface BrowserInspectorOptions extends InspectorOptions {
 export function createBrowserInspector(
   options?: BrowserInspectorOptions
 ): Inspector<BrowserAdapter> {
-  const adapter = new BrowserAdapter(options);
+  const resolvedOptions = {
+    url: 'https://stately.ai/inspect',
+    filter: () => true,
+    serialize: (event) => JSON.parse(safeStringify(event)),
+    autoStart: true,
+    iframe: null,
+    ...options,
+    window: options?.window ?? window,
+  } satisfies Required<BrowserInspectorOptions>;
+  const adapter = new BrowserAdapter(resolvedOptions);
   const inspector = createInspector(adapter);
 
   // Start immediately
-  inspector.start();
+  if (resolvedOptions.autoStart) {
+    inspector.start();
+  }
 
   return inspector;
 }
@@ -90,15 +101,9 @@ export function createBrowserReceiver(
     subscribe(observerOrFn) {
       const observer = toObserver(observerOrFn);
       observers.add(observer);
-      // const listener = (event: MessageEvent) => {
-      //   observer.next?.(event.data);
-      // };
-
-      // window.addEventListener('message', listener);
 
       return {
         unsubscribe() {
-          // window.removeEventListener('message', listener);
           observers.delete(observer);
         },
       };
@@ -115,4 +120,53 @@ export function createBrowserReceiver(
   }
 
   return receiver;
+}
+
+export class BrowserAdapter implements Adapter {
+  private status = 'disconnected' as 'disconnected' | 'connected';
+  private deferredEvents: StatelyInspectionEvent[] = [];
+  public targetWindow: Window | null = null;
+
+  constructor(public options: Required<BrowserInspectorOptions>) {}
+  public start() {
+    this.targetWindow = this.options.iframe
+      ? null
+      : this.options.window.open(String(this.options.url), 'xstateinspector');
+
+    if (this.options.iframe) {
+      this.options.iframe.addEventListener('load', () => {
+        this.targetWindow = this.options.iframe?.contentWindow ?? null;
+      });
+      this.options.iframe?.setAttribute('src', String(this.options.url));
+    }
+
+    this.options.window.addEventListener('message', (event) => {
+      if (
+        isEventObject(event.data) &&
+        event.data.type === '@statelyai.connected'
+      ) {
+        this.status = 'connected';
+        this.deferredEvents.forEach((event) => {
+          const serializedEvent = this.options.serialize(event);
+          this.targetWindow?.postMessage(serializedEvent, '*');
+        });
+      }
+    });
+  }
+  public stop() {
+    this.targetWindow?.postMessage({ type: '@statelyai.disconnected' }, '*');
+    this.status = 'disconnected';
+  }
+  public send(event: StatelyInspectionEvent) {
+    const shouldSendEvent = this.options.filter(event);
+    if (!shouldSendEvent) {
+      return;
+    }
+
+    if (this.status === 'connected') {
+      const serializedEvent = this.options.serialize(event);
+      this.targetWindow?.postMessage(serializedEvent, '*');
+    }
+    this.deferredEvents.push(event);
+  }
 }
