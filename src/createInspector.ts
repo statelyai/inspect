@@ -101,7 +101,7 @@ export function createInspector<TAdapter extends Adapter>(
       adapter.send({
         type: '@xstate.snapshot',
         snapshot: info.snapshot as unknown as Snapshot<unknown>,
-        event: info.event ?? (null as any),
+        event: info.event ?? { type: '' },
         sessionId,
         id: null as any,
         createdAt: Date.now().toString(),
