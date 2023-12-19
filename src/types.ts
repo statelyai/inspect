@@ -51,8 +51,10 @@ export interface Adapter {
 }
 
 export interface InspectedSnapshot {
-  status: Snapshot<unknown>['status'];
+  status?: Snapshot<unknown>['status'];
   context?: any;
+  value?: any;
+  output?: any;
 }
 
 export interface Inspector<TAdapter extends Adapter> {

@@ -100,7 +100,10 @@ export function createInspector<TAdapter extends Adapter>(
         typeof info.actor === 'string' ? info.actor : info.actor.sessionId;
       adapter.send({
         type: '@xstate.snapshot',
-        snapshot: info.snapshot as unknown as Snapshot<unknown>,
+        snapshot: {
+          status: 'active',
+          ...info.snapshot,
+        } as unknown as Snapshot<unknown>,
         event: info.event ?? { type: '' },
         sessionId,
         id: null as any,

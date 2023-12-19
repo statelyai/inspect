@@ -10,7 +10,7 @@ export class BrowserAdapter implements Adapter {
 
   constructor(options: BrowserInspectorOptions = {}) {
     const resolvedOptions: Required<BrowserInspectorOptions> = {
-      url: 'https://stately.ai/registry/inspect',
+      url: 'https://stately.ai/inspect',
       filter: () => true,
       serialize: (event) => JSON.parse(safeStringify(event)),
       iframe: null,
