@@ -27,7 +27,7 @@ const actor = createActor(machine, {
 actor.start();
 ```
 
-**Browser inspector with anything:**
+**Browser inspector with _anything_:**
 
 ```ts
 import { createBrowserInspector } from '@statelyai/inspect';
@@ -36,31 +36,21 @@ const inspector = createBrowserInspector();
 
 // ...
 
-inspector.actor({
-  actor: 'someActor',
-  snapshot: {
-    status: 'active',
-    context: {
-      /* any context data */
-    },
+inspector.actor('someActor', {
+  status: 'active',
+  context: {
+    /* any context data */
   },
 });
 
-inspector.actor({ actor: 'anotherActor' });
+inspector.actor('anotherActor');
 
-inspector.event({
-  target: 'someActor',
-  event: { type: 'hello' },
-  source: 'anotherActor',
-});
+inspector.event('someActor', 'hello', { source: 'anotherActor' });
 
-inspector.snapshot({
-  actor: 'anotherActor',
-  snapshot: {
-    status: 'active',
-    context: {
-      /* any context data */
-    },
+inspector.snapshot('anotherActor', {
+  status: 'active',
+  context: {
+    /* any context data */
   },
 });
 ```
