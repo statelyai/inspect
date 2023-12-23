@@ -52,8 +52,7 @@ export function createInspector<TAdapter extends Adapter>(
 ): Inspector<TAdapter> {
   const inspector: Inspector<TAdapter> = {
     adapter,
-    actor: (info) => {
-      const actorRef = info.actor;
+    actor: (actorRef, snapshot, info) => {
       const sessionId =
         typeof actorRef === 'string' ? actorRef : actorRef.sessionId;
       const definitionObject = (actorRef as any)?.logic?.config;
@@ -80,13 +79,12 @@ export function createInspector<TAdapter extends Adapter>(
         parentId,
         id: null as any,
         definition,
-        snapshot: info.snapshot ?? { status: 'active' },
+        snapshot: snapshot ?? { status: 'active' },
       } satisfies StatelyActorEvent);
     },
-    event(info) {
-      const sessionId =
-        typeof info.target === 'string' ? info.target : info.target.sessionId;
-      const sourceId = !info.source
+    event(target, event, info) {
+      const sessionId = typeof target === 'string' ? target : target.sessionId;
+      const sourceId = !info?.source
         ? undefined
         : typeof info.source === 'string'
         ? info.source
@@ -95,23 +93,22 @@ export function createInspector<TAdapter extends Adapter>(
         type: '@xstate.event',
         sourceId,
         sessionId,
-        event: toEventObject(info.event),
+        event: toEventObject(event),
         id: Math.random().toString(),
         createdAt: Date.now().toString(),
         rootId: 'anonymous',
         _version: pkg.version,
       });
     },
-    snapshot(info) {
-      const sessionId =
-        typeof info.actor === 'string' ? info.actor : info.actor.sessionId;
+    snapshot(actor, snapshot, info) {
+      const sessionId = typeof actor === 'string' ? actor : actor.sessionId;
       adapter.send({
         type: '@xstate.snapshot',
         snapshot: {
           status: 'active',
-          ...info.snapshot,
+          ...snapshot,
         } as unknown as Snapshot<unknown>,
-        event: info.event ?? { type: '' },
+        event: info?.event ?? { type: '' },
         sessionId,
         id: null as any,
         createdAt: Date.now().toString(),
