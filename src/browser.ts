@@ -2,6 +2,7 @@ import { AnyEventObject, Observer, Subscribable, toObserver } from 'xstate';
 import { Adapter, Inspector, StatelyInspectionEvent } from './types';
 import { InspectorOptions, createInspector } from './createInspector';
 import safeStringify from 'fast-safe-stringify';
+import { UselessAdapter } from './useless';
 
 interface BrowserReceiver extends Subscribable<StatelyInspectionEvent> {}
 
@@ -39,6 +40,15 @@ export interface BrowserInspectorOptions extends InspectorOptions {
 export function createBrowserInspector(
   options?: BrowserInspectorOptions
 ): Inspector<BrowserAdapter> {
+  const resolvedWindow =
+    options?.window ?? (typeof window === 'undefined' ? undefined : window);
+
+  if (!resolvedWindow) {
+    console.error('Window does not exist; inspector cannot be started.');
+
+    return new UselessAdapter() as any;
+  }
+
   const resolvedOptions = {
     url: 'https://stately.ai/inspect',
     filter: () => true,
@@ -46,7 +56,7 @@ export function createBrowserInspector(
     autoStart: true,
     iframe: null,
     ...options,
-    window: options?.window ?? window,
+    window: resolvedWindow,
   } satisfies Required<BrowserInspectorOptions>;
   const adapter = new BrowserAdapter(resolvedOptions);
   const inspector = createInspector(adapter);

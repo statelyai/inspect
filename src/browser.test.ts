@@ -65,3 +65,16 @@ test('inspector observes a state machine', async () => {
     ]
   `);
 });
+
+test('inspector works with window undefined', async () => {
+  const inspector = createBrowserInspector({
+    window: undefined,
+  });
+
+  const machine = createMachine({});
+  const actor = createActor(machine, { inspect: inspector.inspect });
+
+  expect(() => {
+    actor.start();
+  }).not.toThrow();
+});
