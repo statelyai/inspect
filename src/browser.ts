@@ -2,7 +2,7 @@ import { AnyEventObject, Observer, Subscribable, toObserver } from 'xstate';
 import { Adapter, Inspector, StatelyInspectionEvent } from './types';
 import { InspectorOptions, createInspector } from './createInspector';
 import safeStringify from 'fast-safe-stringify';
-import { ConsoleAdapter } from './console';
+import { UselessAdapter } from './useless';
 
 interface BrowserReceiver extends Subscribable<StatelyInspectionEvent> {}
 
@@ -45,12 +45,8 @@ export function createBrowserInspector(
 
   if (!resolvedWindow) {
     console.error('Window does not exist; inspector cannot be started.');
-    return new ConsoleAdapter({
-      filter: () => true,
-      serialize: (event) => JSON.parse(safeStringify(event)),
-      autoStart: true,
-      ...options,
-    }) as any;
+
+    return new UselessAdapter() as any;
   }
 
   const resolvedOptions = {
