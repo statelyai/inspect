@@ -48,8 +48,19 @@ export const defaultInspectorOptions: Required<InspectorOptions> = {
 };
 
 export function createInspector<TAdapter extends Adapter>(
-  adapter: TAdapter
+  adapter: TAdapter,
+  options?: InspectorOptions
 ): Inspector<TAdapter> {
+  function sendAdapter(event: StatelyInspectionEvent): void {
+    if (options?.filter && !options.filter(event)) {
+      // Event filtered out
+      return;
+    }
+    const serializedEvent = options?.serialize?.(event) ?? event;
+    // idleCallback(() => {
+    adapter.send(serializedEvent);
+    // })
+  }
   const inspector: Inspector<TAdapter> = {
     adapter,
     actor: (actorRef, snapshot, info) => {
@@ -69,7 +80,7 @@ export function createInspector<TAdapter extends Adapter>(
           : actorRef._parent?.sessionId;
       const name = definitionObject ? definitionObject.id : sessionId;
 
-      adapter.send({
+      sendAdapter({
         type: '@xstate.actor',
         name,
         sessionId,
@@ -82,14 +93,14 @@ export function createInspector<TAdapter extends Adapter>(
         snapshot: snapshot ?? { status: 'active' },
       } satisfies StatelyActorEvent);
     },
-    event(target, event, info) {
+    event: (target, event, info) => {
       const sessionId = typeof target === 'string' ? target : target.sessionId;
       const sourceId = !info?.source
         ? undefined
         : typeof info.source === 'string'
         ? info.source
         : info.source.sessionId;
-      adapter.send({
+      sendAdapter({
         type: '@xstate.event',
         sourceId,
         sessionId,
@@ -100,9 +111,9 @@ export function createInspector<TAdapter extends Adapter>(
         _version: pkg.version,
       });
     },
-    snapshot(actor, snapshot, info) {
+    snapshot: (actor, snapshot, info) => {
       const sessionId = typeof actor === 'string' ? actor : actor.sessionId;
-      adapter.send({
+      sendAdapter({
         type: '@xstate.snapshot',
         snapshot: {
           status: 'active',
@@ -120,7 +131,7 @@ export function createInspector<TAdapter extends Adapter>(
       next: (event) => {
         idleCallback(function inspectNext() {
           const convertedEvent = convertXStateEvent(event);
-          adapter.send(convertedEvent);
+          sendAdapter(convertedEvent);
         });
       },
     },
