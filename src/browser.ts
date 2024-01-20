@@ -59,7 +59,7 @@ export function createBrowserInspector(
     window: resolvedWindow,
   } satisfies Required<BrowserInspectorOptions>;
   const adapter = new BrowserAdapter(resolvedOptions);
-  const inspector = createInspector(adapter);
+  const inspector = createInspector(adapter, resolvedOptions);
 
   // Start immediately
   if (resolvedOptions.autoStart) {

@@ -188,7 +188,7 @@ test('Inspected event includes version', () => {
   expect(events[0]._version).toEqual(pkg.version);
 });
 
-test('Serialized events', () => {
+test('options.serialize', async () => {
   const events: StatelyInspectionEvent[] = [];
   const testAdapter: Adapter = {
     send: (event) => {
@@ -236,6 +236,26 @@ test('Serialized events', () => {
 
   expect((events[2] as StatelyEventEvent).event).toEqual({
     type: 'updateUser',
+    user: 'anonymous',
+  });
+
+  inspector.inspect.next?.({
+    type: '@xstate.event',
+    actorRef: {} as any,
+    event: {
+      type: 'setUser',
+      user: 'Another',
+    },
+    rootId: '',
+    sourceRef: undefined,
+  });
+
+  await new Promise<void>((res) => {
+    setTimeout(res, 10);
+  });
+
+  expect((events[3] as StatelyEventEvent).event).toEqual({
+    type: 'setUser',
     user: 'anonymous',
   });
 });

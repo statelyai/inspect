@@ -73,7 +73,7 @@ export class WebSocketAdapter implements Adapter {
 export function createWebSocketInspector(options?: WebSocketInspectorOptions) {
   const adapter = new WebSocketAdapter(options);
 
-  const inspector = createInspector(adapter);
+  const inspector = createInspector(adapter, options);
 
   return inspector;
 }
