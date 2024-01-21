@@ -259,3 +259,32 @@ test('options.serialize', async () => {
     user: 'anonymous',
   });
 });
+
+test('it safely stringifies objects with circular dependencies', () => {
+  const events: StatelyInspectionEvent[] = [];
+  const testAdapter: Adapter = {
+    send: (event) => {
+      events.push(event);
+    },
+    start: () => {},
+    stop: () => {},
+  };
+
+  const inspector = createInspector(testAdapter);
+
+  const circular = {
+    get val() {
+      return circular;
+    },
+  };
+
+  expect(() => {
+    inspector.inspect.next?.({
+      type: '@xstate.snapshot',
+      snapshot: { context: circular } as any,
+      actorRef: {} as any,
+      event: { type: 'any' },
+      rootId: '',
+    });
+  }).not.toThrow();
+});
