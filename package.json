@@ -1,5 +1,6 @@
 {
   "devDependencies": {
+    "@changesets/changelog-github": "^0.5.0",
     "@changesets/cli": "^2.26.2",
     "@types/jsdom": "^21.1.6",
     "jsdom": "^23.0.0",
@@ -26,7 +27,10 @@
     "build": "tsup src/index.ts --dts",
     "watch": "tsup src/index.ts --dts --watch",
     "test": "vitest",
-    "prepublishOnly": "tsup src/index.ts --dts"
+    "prepublishOnly": "tsup src/index.ts --dts",
+    "changeset": "changeset",
+    "release": "changeset publish",
+    "version": "changeset version"
   },
   "publishConfig": {
     "access": "public"
