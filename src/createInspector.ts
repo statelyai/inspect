@@ -10,6 +10,7 @@ import { Inspector } from './types';
 import { AnyActorRef, InspectionEvent, Snapshot } from 'xstate';
 import pkg from '../package.json';
 import { idleCallback } from './idleCallback';
+import safeStringify from 'fast-safe-stringify';
 
 function getRoot(actorRef: AnyActorRef) {
   let marker: AnyActorRef | undefined = actorRef;
@@ -203,7 +204,7 @@ export function convertXStateEvent(
       return {
         type: '@xstate.snapshot',
         event: inspectionEvent.event,
-        snapshot: JSON.parse(JSON.stringify(inspectionEvent.snapshot)),
+        snapshot: JSON.parse(safeStringify(inspectionEvent.snapshot)),
         sessionId: inspectionEvent.actorRef.sessionId,
         _version: pkg.version,
         createdAt: Date.now().toString(),
