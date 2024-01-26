@@ -1,4 +1,4 @@
-import type { AnyEventObject, AnyActorRef } from 'xstate';
+import type { AnyActorRef, AnyEventObject } from 'xstate';
 
 export function toEventObject(event: AnyEventObject | string): AnyEventObject {
   if (typeof event === 'string') {
@@ -16,3 +16,8 @@ export function isActorRef(actorRef: any): actorRef is AnyActorRef {
     typeof actorRef.send === 'function'
   );
 }
+
+export const isNode =
+  typeof process !== 'undefined' &&
+  typeof process.versions?.node !== 'undefined' &&
+  typeof document === 'undefined';
