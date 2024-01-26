@@ -13,7 +13,7 @@ const isDevMode = false;
 
 export function createSkyInspector(
   options: {
-    apiKey?: string; // Not used yet, will be used to add additional premium features later
+    apiKey?: string; // Not used yet, will be used to add additional features later
     onerror?: (error: Error) => void;
   } & InspectorOptions = {}
 ): ReturnType<typeof inspectCreator> {
