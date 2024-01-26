@@ -8,6 +8,9 @@ import {
 } from './createInspector';
 import { isNode } from './utils';
 
+// Not the most elegant way to do this, but it makes it much easier to test local changes
+const isDevMode = false;
+
 export function createSkyInspector(
   options: {
     apiKey?: string; // Not used yet, will be used to add additional premium features later
@@ -15,8 +18,12 @@ export function createSkyInspector(
   } & InspectorOptions = {}
 ): ReturnType<typeof inspectCreator> {
   const { host, apiBaseURL } = {
-    host: 'stately-sky-beta.mellson.partykit.dev', // 'localhost:1999'
-    apiBaseURL: 'https://stately.ai/registry/api/sky', // 'http://localhost:3000/registry/api/sky',
+    host: isDevMode
+      ? 'localhost:1999'
+      : 'stately-sky-beta.mellson.partykit.dev',
+    apiBaseURL: isDevMode
+      ? 'http://localhost:3000/registry/api/sky'
+      : 'https://stately.ai/registry/api/sky',
   };
   const server = apiBaseURL.replace('/api/sky', '');
   const { apiKey, onerror, ...inspectorOptions } = options;
@@ -42,16 +49,12 @@ export function createSkyInspector(
       },
     });
   } else {
-    const { filter, serialize } = inspectorOptions;
     return createBrowserInspector({
       ...inspectorOptions,
       url: liveInspectUrl,
-      serialize(event) {
-        if (!filter || filter(event)) {
-          const skyEvent = apiKey ? { apiKey, ...event } : event;
-          socket.send(stringify(skyEvent));
-        }
-        return serialize ? serialize(event) : event;
+      send(event) {
+        const skyEvent = apiKey ? { apiKey, ...event } : event;
+        socket.send(stringify(skyEvent));
       },
     });
   }

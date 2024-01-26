@@ -1,7 +1,7 @@
-import { AnyEventObject, Observer, Subscribable, toObserver } from 'xstate';
-import { Adapter, Inspector, StatelyInspectionEvent } from './types';
-import { InspectorOptions, createInspector } from './createInspector';
 import safeStringify from 'fast-safe-stringify';
+import { AnyEventObject, Observer, Subscribable, toObserver } from 'xstate';
+import { InspectorOptions, createInspector } from './createInspector';
+import { Adapter, Inspector, StatelyInspectionEvent } from './types';
 import { UselessAdapter } from './useless';
 
 interface BrowserReceiver extends Subscribable<StatelyInspectionEvent> {}
@@ -33,12 +33,16 @@ export interface BrowserInspectorOptions extends InspectorOptions {
   iframe?: HTMLIFrameElement | null;
 }
 
+interface OptionalBrowserInspectorOptions {
+  send?: Adapter['send'];
+}
+
 /**
  * Creates a browser-based inspector that sends events to a remote inspector window.
  * The remote inspector opens an inspector window at the specified URL by default.
  */
 export function createBrowserInspector(
-  options?: BrowserInspectorOptions
+  options?: BrowserInspectorOptions & OptionalBrowserInspectorOptions
 ): Inspector<BrowserAdapter> {
   const resolvedWindow =
     options?.window ?? (typeof window === 'undefined' ? undefined : window);
@@ -57,7 +61,8 @@ export function createBrowserInspector(
     iframe: null,
     ...options,
     window: resolvedWindow,
-  } satisfies Required<BrowserInspectorOptions>;
+  } satisfies Required<BrowserInspectorOptions> &
+    OptionalBrowserInspectorOptions;
   const adapter = new BrowserAdapter(resolvedOptions);
   const inspector = createInspector(adapter, resolvedOptions);
 
@@ -137,7 +142,10 @@ export class BrowserAdapter implements Adapter {
   private deferredEvents: StatelyInspectionEvent[] = [];
   public targetWindow: Window | null = null;
 
-  constructor(public options: Required<BrowserInspectorOptions>) {}
+  constructor(
+    public options: Required<BrowserInspectorOptions> &
+      OptionalBrowserInspectorOptions
+  ) {}
   public start() {
     this.targetWindow = this.options.iframe
       ? null
@@ -173,10 +181,13 @@ export class BrowserAdapter implements Adapter {
       return;
     }
 
-    if (this.status === 'connected') {
+    if (this.options.send) {
+      this.options.send(event);
+    } else if (this.status === 'connected') {
       const serializedEvent = this.options.serialize(event);
       this.targetWindow?.postMessage(serializedEvent, '*');
     }
+
     this.deferredEvents.push(event);
   }
 }
