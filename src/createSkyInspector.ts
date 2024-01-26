@@ -15,8 +15,8 @@ export function createSkyInspector(
   } & InspectorOptions = {}
 ): ReturnType<typeof inspectCreator> {
   const { host, apiBaseURL } = {
-    host: 'localhost:1999', // 'stately-sky-beta.mellson.partykit.dev'
-    apiBaseURL: 'http://localhost:3000/registry/api/sky', // 'https://stately.ai/registry/api/sky',
+    host: 'stately-sky-beta.mellson.partykit.dev', // 'localhost:1999'
+    apiBaseURL: 'https://stately.ai/registry/api/sky', // 'http://localhost:3000/registry/api/sky',
   };
   const server = apiBaseURL.replace('/api/sky', '');
   const { apiKey, onerror, ...inspectorOptions } = options;
