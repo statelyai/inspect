@@ -1,7 +1,7 @@
 import { InspectorOptions, createInspector } from './createInspector';
 import { Adapter, StatelyInspectionEvent } from './types';
 import WebSocket from 'isomorphic-ws';
-import safeStringify from 'fast-safe-stringify';
+import safeStringify from 'safe-stable-stringify';
 import { Observer, Subscribable, toObserver } from 'xstate';
 
 export interface WebSocketInspectorOptions extends InspectorOptions {
