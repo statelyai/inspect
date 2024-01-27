@@ -10,7 +10,7 @@ import { Inspector } from './types';
 import { AnyActorRef, InspectionEvent, Snapshot } from 'xstate';
 import pkg from '../package.json';
 import { idleCallback } from './idleCallback';
-import safeStringify from 'fast-safe-stringify';
+import safeStringify from 'safe-stable-stringify';
 
 function getRoot(actorRef: AnyActorRef) {
   let marker: AnyActorRef | undefined = actorRef;
