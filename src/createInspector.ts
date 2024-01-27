@@ -69,7 +69,7 @@ export function createInspector<TAdapter extends Adapter>(
         typeof actorRef === 'string' ? actorRef : actorRef.sessionId;
       const definitionObject = (actorRef as any)?.logic?.config;
       const definition = definitionObject
-        ? JSON.stringify(definitionObject)
+        ? safeStringify(definitionObject)
         : undefined;
       const rootId =
         info?.rootId ?? typeof actorRef === 'string'
@@ -163,14 +163,14 @@ export function convertXStateEvent(
       }
       const definitionString =
         typeof definitionObject === 'object'
-          ? JSON.stringify(definitionObject, (key, value) => {
+          ? safeStringify(definitionObject, (_key, value) => {
               if (typeof value === 'function') {
                 return { type: value.name };
               }
 
               return value;
             })
-          : JSON.stringify({
+          : safeStringify({
               id: name,
             });
 
