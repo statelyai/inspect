@@ -1,5 +1,13 @@
 # @statelyai/inspect
 
+## 0.2.2
+
+### Patch Changes
+
+- [#15](https://github.com/statelyai/inspect/pull/15) [`b20b7b7`](https://github.com/statelyai/inspect/commit/b20b7b71722f4f3a68ee17cfad471d89bc1f0e2e) Thanks [@davidkpiano](https://github.com/davidkpiano)! - Use `safe-stable-stringify` everywhere applicable
+
+- [#13](https://github.com/statelyai/inspect/pull/13) [`9d9229d`](https://github.com/statelyai/inspect/commit/9d9229dcd6a83a8d32d65c4f9eca084e7f5b66b0) Thanks [@davidkpiano](https://github.com/davidkpiano)! - Replace fast-safe-stringify with stable-safe-stringify
+
 ## 0.2.1
 
 ### Patch Changes

@@ -11,7 +11,7 @@
     "xstate": "^5.5.1"
   },
   "name": "@statelyai/inspect",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Inspection utilities for state, actors, workflows, and state machines.",
   "main": "dist/index.js",
   "repository": "https://github.com/statelyai/inspect.git",
@@ -22,7 +22,8 @@
     "isomorphic-ws": "^5.0.0",
     "partysocket": "^0.0.25",
     "superjson": "^1",
-    "uuid": "^9.0.1"
+    "uuid": "^9.0.1",
+    "safe-stable-stringify": "^2.4.3"
   },
   "peerDependencies": {
     "xstate": "^5.5.1"

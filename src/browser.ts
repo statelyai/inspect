@@ -56,7 +56,7 @@ export function createBrowserInspector(
   const resolvedOptions = {
     url: 'https://stately.ai/inspect',
     filter: () => true,
-    serialize: (event) => JSON.parse(safeStringify(event)),
+    serialize: (inspectionEvent) => JSON.parse(safeStringify(inspectionEvent)),
     autoStart: true,
     iframe: null,
     ...options,

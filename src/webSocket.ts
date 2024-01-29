@@ -1,7 +1,7 @@
 import { InspectorOptions, createInspector } from './createInspector';
 import { Adapter, StatelyInspectionEvent } from './types';
 import WebSocket from 'isomorphic-ws';
-import safeStringify from 'fast-safe-stringify';
+import safeStringify from 'safe-stable-stringify';
 import { Observer, Subscribable, toObserver } from 'xstate';
 
 export interface WebSocketInspectorOptions extends InspectorOptions {
@@ -17,7 +17,8 @@ export class WebSocketAdapter implements Adapter {
   constructor(options?: WebSocketInspectorOptions) {
     this.options = {
       filter: () => true,
-      serialize: (event) => JSON.parse(safeStringify(event)),
+      serialize: (inspectionEvent) =>
+        JSON.parse(safeStringify(inspectionEvent)),
       autoStart: true,
       url: 'ws://localhost:8080',
       ...options,
@@ -30,8 +31,9 @@ export class WebSocketAdapter implements Adapter {
       this.ws.onopen = () => {
         console.log('websocket open');
         this.status = 'open';
-        this.deferredEvents.forEach((event) => {
-          this.ws.send(JSON.stringify(event));
+        this.deferredEvents.forEach((inspectionEvent) => {
+          const serializedEvent = this.options.serialize(inspectionEvent);
+          this.ws.send(safeStringify(serializedEvent));
         });
       };
 
@@ -61,11 +63,11 @@ export class WebSocketAdapter implements Adapter {
     this.ws.close();
     this.status = 'closed';
   }
-  public send(event: StatelyInspectionEvent) {
+  public send(inspectionEvent: StatelyInspectionEvent) {
     if (this.status === 'open') {
-      this.ws.send(JSON.stringify(event));
+      this.ws.send(safeStringify(inspectionEvent));
     } else {
-      this.deferredEvents.push(event);
+      this.deferredEvents.push(inspectionEvent);
     }
   }
 }
