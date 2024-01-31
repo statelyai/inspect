@@ -1,8 +1,9 @@
-import { AnyEventObject, Observer, Subscribable, toObserver } from 'xstate';
+import type { AnyEventObject, Observer, Subscribable } from 'xstate';
 import { Adapter, Inspector, StatelyInspectionEvent } from './types';
 import { InspectorOptions, createInspector } from './createInspector';
 import safeStringify from 'safe-stable-stringify';
 import { UselessAdapter } from './useless';
+import { toObserver } from './utils';
 
 interface BrowserReceiver extends Subscribable<StatelyInspectionEvent> {}
 

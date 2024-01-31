@@ -1,4 +1,4 @@
-import type { AnyEventObject, AnyActorRef } from 'xstate';
+import type { AnyEventObject, AnyActorRef, Observer } from 'xstate';
 
 export function toEventObject(event: AnyEventObject | string): AnyEventObject {
   if (typeof event === 'string') {
@@ -15,4 +15,21 @@ export function isActorRef(actorRef: any): actorRef is AnyActorRef {
     typeof actorRef.sessionId === 'string' &&
     typeof actorRef.send === 'function'
   );
+}
+
+export function toObserver<T>(
+  nextHandler?: Observer<T> | ((value: T) => void),
+  errorHandler?: (error: any) => void,
+  completionHandler?: () => void
+): Observer<T> {
+  const isObserver = typeof nextHandler === 'object';
+  const self = isObserver ? nextHandler : undefined;
+
+  return {
+    next: (isObserver ? nextHandler.next : nextHandler)?.bind(self),
+    error: (isObserver ? nextHandler.error : errorHandler)?.bind(self),
+    complete: (isObserver ? nextHandler.complete : completionHandler)?.bind(
+      self
+    ),
+  };
 }

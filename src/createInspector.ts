@@ -7,7 +7,7 @@ import {
 } from './types';
 import { toEventObject } from './utils';
 import { Inspector } from './types';
-import { AnyActorRef, InspectionEvent, Snapshot } from 'xstate';
+import type { AnyActorRef, InspectionEvent, Snapshot } from 'xstate';
 import pkg from '../package.json';
 import { idleCallback } from './idleCallback';
 import safeStringify from 'safe-stable-stringify';
