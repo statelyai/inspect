@@ -1,5 +1,11 @@
 # @statelyai/inspect
 
+## 0.2.3
+
+### Patch Changes
+
+- [#12](https://github.com/statelyai/inspect/pull/12) [`c878733`](https://github.com/statelyai/inspect/commit/c8787338e100f45649b14eae49f3eddacefd7df9) Thanks [@mellson](https://github.com/mellson)! - Adds `createSkyInspector`, which allows you to inspect machines in Node or the browser. The inspection will send the events to a server backend through websockets and allows you to open and share a live inspection URL.
+
 ## 0.2.2
 
 ### Patch Changes
