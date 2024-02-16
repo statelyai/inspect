@@ -1,5 +1,11 @@
 # @statelyai/inspect
 
+## 0.2.4
+
+### Patch Changes
+
+- [#18](https://github.com/statelyai/inspect/pull/18) [`7d569b1`](https://github.com/statelyai/inspect/commit/7d569b111207d2f9999f2cfa9e270b0c93dc9b9c) Thanks [@davidkpiano](https://github.com/davidkpiano)! - Do not crash on unhandled inspection event type
+
 ## 0.2.3
 
 ### Patch Changes
