@@ -213,8 +213,8 @@ export function convertXStateEvent(
       } satisfies StatelySnapshotEvent;
     }
     default: {
-      throw new Error(
-        `Invalid inspection event type: ${(inspectionEvent as any).type}`
+      console.warn(
+        `Unhandled inspection event type: ${(inspectionEvent as any).type}`
       );
     }
   }
