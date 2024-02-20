@@ -8,7 +8,7 @@
     "tsup": "^7.2.0",
     "typescript": "^5.1.6",
     "vitest": "^0.34.6",
-    "xstate": "^5.5.1"
+    "xstate": "^5.7.1"
   },
   "name": "@statelyai/inspect",
   "version": "0.2.4",
@@ -21,12 +21,12 @@
     "fast-safe-stringify": "^2.1.1",
     "isomorphic-ws": "^5.0.0",
     "partysocket": "^0.0.25",
+    "safe-stable-stringify": "^2.4.3",
     "superjson": "^1",
-    "uuid": "^9.0.1",
-    "safe-stable-stringify": "^2.4.3"
+    "uuid": "^9.0.1"
   },
   "peerDependencies": {
-    "xstate": "^5.5.1"
+    "xstate": "^5.7.1"
   },
   "scripts": {
     "build": "tsup src/index.ts --dts",
@@ -36,7 +36,8 @@
     "changeset": "changeset",
     "release": "changeset publish",
     "version": "changeset version",
-    "dev": "yarn build && ./scripts/dev.sh"
+    "dev": "yarn build && ./scripts/dev.sh",
+    "typecheck": "tsc --noEmit"
   },
   "publishConfig": {
     "access": "public"
