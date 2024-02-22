@@ -132,7 +132,9 @@ export function createInspector<TAdapter extends Adapter>(
       next: (event) => {
         idleCallback(function inspectNext() {
           const convertedEvent = convertXStateEvent(event);
-          sendAdapter(convertedEvent);
+          if (convertedEvent) {
+            sendAdapter(convertedEvent);
+          }
         });
       },
     },
@@ -149,7 +151,7 @@ export function createInspector<TAdapter extends Adapter>(
 
 export function convertXStateEvent(
   inspectionEvent: InspectionEvent
-): StatelyInspectionEvent {
+): StatelyInspectionEvent | undefined {
   switch (inspectionEvent.type) {
     case '@xstate.actor': {
       const actorRef = inspectionEvent.actorRef;
@@ -216,6 +218,7 @@ export function convertXStateEvent(
       console.warn(
         `Unhandled inspection event type: ${(inspectionEvent as any).type}`
       );
+      return undefined;
     }
   }
 }
