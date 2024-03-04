@@ -1,5 +1,11 @@
 # @statelyai/inspect
 
+## 0.2.5
+
+### Patch Changes
+
+- [#21](https://github.com/statelyai/inspect/pull/21) [`a225b37`](https://github.com/statelyai/inspect/commit/a225b37c7e466091528bcf275b57488f144b1f47) Thanks [@davidkpiano](https://github.com/davidkpiano)! - Do not warn for XState events
+
 ## 0.2.4
 
 ### Patch Changes
