@@ -215,6 +215,10 @@ export function convertXStateEvent(
       } satisfies StatelySnapshotEvent;
     }
     default: {
+      // Ignore future XState inspection events (assume that they are valid)
+      if (inspectionEvent.type.startsWith('@xstate.')) {
+        return undefined;
+      }
       console.warn(
         `Unhandled inspection event type: ${(inspectionEvent as any).type}`
       );
