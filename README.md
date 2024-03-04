@@ -2,6 +2,8 @@
 
 The `@statelyai/inspect` package enables developers to visually inspect state transitions and actor communication in any JavaScript/TypeScript app.
 
+**Documentation:** [stately.ai/docs/inspector](https://stately.ai/docs/inspector)
+
 ## Features
 
 - Visualize state machines
