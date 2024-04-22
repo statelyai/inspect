@@ -61,7 +61,7 @@ test('Creates an inspector for a state machine', async () => {
           },
           {
             "event": {
-              "input": undefined,
+              "input": null,
               "type": "xstate.init",
             },
             "sessionId": "x:0",
