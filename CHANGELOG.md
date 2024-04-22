@@ -1,5 +1,11 @@
 # @statelyai/inspect
 
+## 0.3.0
+
+### Minor Changes
+
+- [#24](https://github.com/statelyai/inspect/pull/24) [`9cfc0b3`](https://github.com/statelyai/inspect/commit/9cfc0b3d8f6703de46dd030fe271f2516e36d1d1) Thanks [@davidkpiano](https://github.com/davidkpiano)! - The `serialize` option will now pre-serialize the event using `superjson` before the custom serialization.
+
 ## 0.2.5
 
 ### Patch Changes
