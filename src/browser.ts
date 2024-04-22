@@ -1,6 +1,10 @@
 import safeStringify from 'fast-safe-stringify';
 import { AnyEventObject, Observer, Subscribable, toObserver } from 'xstate';
-import { InspectorOptions, createInspector } from './createInspector';
+import {
+  InspectorOptions,
+  createInspector,
+  defaultInspectorOptions,
+} from './createInspector';
 import { Adapter, Inspector, StatelyInspectionEvent } from './types';
 import { UselessAdapter } from './useless';
 
@@ -165,7 +169,14 @@ export class BrowserAdapter implements Adapter {
       ) {
         this.status = 'connected';
         this.deferredEvents.forEach((event) => {
-          const serializedEvent = this.options.serialize(event);
+          const preSerializedEvent = defaultInspectorOptions.serialize(
+            event,
+            event
+          );
+          const serializedEvent = this.options.serialize(
+            preSerializedEvent,
+            event
+          );
           this.targetWindow?.postMessage(serializedEvent, '*');
         });
       }
@@ -184,7 +195,11 @@ export class BrowserAdapter implements Adapter {
     if (this.options.send) {
       this.options.send(event);
     } else if (this.status === 'connected') {
-      const serializedEvent = this.options.serialize(event);
+      const preSerializedEvent = defaultInspectorOptions.serialize(
+        event,
+        event
+      );
+      const serializedEvent = this.options.serialize(preSerializedEvent, event);
       this.targetWindow?.postMessage(serializedEvent, '*');
     }
 
