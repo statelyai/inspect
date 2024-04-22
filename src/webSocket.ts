@@ -1,4 +1,8 @@
-import { InspectorOptions, createInspector } from './createInspector';
+import {
+  InspectorOptions,
+  createInspector,
+  defaultInspectorOptions,
+} from './createInspector';
 import { Adapter, StatelyInspectionEvent } from './types';
 import WebSocket from 'isomorphic-ws';
 import safeStringify from 'safe-stable-stringify';
@@ -32,7 +36,14 @@ export class WebSocketAdapter implements Adapter {
         console.log('websocket open');
         this.status = 'open';
         this.deferredEvents.forEach((inspectionEvent) => {
-          const serializedEvent = this.options.serialize(inspectionEvent);
+          const preSerializedEvent = defaultInspectorOptions.serialize(
+            inspectionEvent,
+            inspectionEvent
+          );
+          const serializedEvent = this.options.serialize(
+            preSerializedEvent,
+            inspectionEvent
+          );
           this.ws.send(safeStringify(serializedEvent));
         });
       };
