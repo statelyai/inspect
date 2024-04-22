@@ -8,4 +8,3 @@ export type {
   StatelySnapshotEvent,
 } from './types';
 export { createWebSocketInspector, createWebSocketReceiver } from './webSocket';
-export { createReduxDevToolsInspector } from './redux';
