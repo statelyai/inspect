@@ -36,14 +36,9 @@ export class WebSocketAdapter implements Adapter {
         console.log('websocket open');
         this.status = 'open';
         this.deferredEvents.forEach((inspectionEvent) => {
-          const preSerializedEvent = defaultInspectorOptions.serialize(
-            inspectionEvent,
-            inspectionEvent
-          );
-          const serializedEvent = this.options.serialize(
-            preSerializedEvent,
-            inspectionEvent
-          );
+          const preSerializedEvent =
+            defaultInspectorOptions.serialize(inspectionEvent);
+          const serializedEvent = this.options.serialize(preSerializedEvent);
           this.ws.send(safeStringify(serializedEvent));
         });
       };
