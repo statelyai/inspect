@@ -11,7 +11,6 @@ import { AnyActorRef, InspectionEvent, Snapshot } from 'xstate';
 import pkg from '../package.json';
 import { idleCallback } from './idleCallback';
 import safeStringify from 'safe-stable-stringify';
-import { serialize } from 'superjson';
 
 function getRoot(actorRef: AnyActorRef) {
   let marker: AnyActorRef | undefined = actorRef;
@@ -34,10 +33,7 @@ function getRootId(actorRefOrId: AnyActorRef | string): string | undefined {
 
 export interface InspectorOptions {
   filter?: (event: StatelyInspectionEvent) => boolean;
-  serialize?: (
-    event: StatelyInspectionEvent,
-    originalEvent: StatelyInspectionEvent
-  ) => StatelyInspectionEvent;
+  serialize?: (event: StatelyInspectionEvent) => StatelyInspectionEvent;
   /**
    * Whether to automatically start the inspector.
    *
@@ -48,8 +44,7 @@ export interface InspectorOptions {
 
 export const defaultInspectorOptions: Required<InspectorOptions> = {
   filter: () => true,
-  serialize: (event) =>
-    serialize(event).json as unknown as StatelyInspectionEvent,
+  serialize: (event) => event,
   autoStart: true,
 };
 
@@ -62,11 +57,10 @@ export function createInspector<TAdapter extends Adapter>(
       // Event filtered out
       return;
     }
-    const preSerializedEvent = defaultInspectorOptions.serialize(event, event);
-    const serializedEvent =
-      options?.serialize?.(preSerializedEvent, event) ?? preSerializedEvent;
-
+    const serializedEvent = options?.serialize?.(event) ?? event;
+    // idleCallback(() => {
     adapter.send(serializedEvent);
+    // })
   }
   const inspector: Inspector<TAdapter> = {
     adapter,
