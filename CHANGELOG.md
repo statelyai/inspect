@@ -1,5 +1,11 @@
 # @statelyai/inspect
 
+## 0.3.1
+
+### Patch Changes
+
+- [#27](https://github.com/statelyai/inspect/pull/27) [`39279fe`](https://github.com/statelyai/inspect/commit/39279fe6680904f8773331fc7b42a5dbf099a7b8) Thanks [@davidkpiano](https://github.com/davidkpiano)! - Revert serialization changes
+
 ## 0.3.0
 
 ### Minor Changes
