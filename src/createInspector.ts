@@ -40,12 +40,14 @@ export interface InspectorOptions {
    * @default true
    */
   autoStart?: boolean;
+  maxDeferredEvents?: number;
 }
 
 export const defaultInspectorOptions: Required<InspectorOptions> = {
   filter: () => true,
   serialize: (event) => event,
   autoStart: true,
+  maxDeferredEvents: 200,
 };
 
 export function createInspector<TAdapter extends Adapter>(

@@ -20,6 +20,7 @@ export class WebSocketAdapter implements Adapter {
 
   constructor(options?: WebSocketInspectorOptions) {
     this.options = {
+      ...defaultInspectorOptions,
       filter: () => true,
       serialize: (inspectionEvent) =>
         JSON.parse(safeStringify(inspectionEvent)),
@@ -74,6 +75,10 @@ export class WebSocketAdapter implements Adapter {
       this.ws.send(safeStringify(inspectionEvent));
     } else {
       this.deferredEvents.push(inspectionEvent);
+
+      if (this.deferredEvents.length > this.options.maxDeferredEvents) {
+        this.deferredEvents.shift();
+      }
     }
   }
 }

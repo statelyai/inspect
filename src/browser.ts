@@ -1,6 +1,10 @@
 import safeStringify from 'fast-safe-stringify';
 import { AnyEventObject, Observer, Subscribable, toObserver } from 'xstate';
-import { InspectorOptions, createInspector } from './createInspector';
+import {
+  InspectorOptions,
+  createInspector,
+  defaultInspectorOptions,
+} from './createInspector';
 import { Adapter, Inspector, StatelyInspectionEvent } from './types';
 import { UselessAdapter } from './useless';
 
@@ -54,6 +58,7 @@ export function createBrowserInspector(
   }
 
   const resolvedOptions = {
+    ...defaultInspectorOptions,
     url: 'https://stately.ai/inspect',
     filter: () => true,
     serialize: (inspectionEvent) => JSON.parse(safeStringify(inspectionEvent)),
@@ -189,5 +194,10 @@ export class BrowserAdapter implements Adapter {
     }
 
     this.deferredEvents.push(event);
+
+    // Remove the oldest event if we've reached the max deferred events
+    if (this.deferredEvents.length > this.options.maxDeferredEvents) {
+      this.deferredEvents.shift();
+    }
   }
 }
