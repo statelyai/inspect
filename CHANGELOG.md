@@ -1,5 +1,31 @@
 # @statelyai/inspect
 
+## 0.5.0
+
+### Minor Changes
+
+- [#32](https://github.com/statelyai/inspect/pull/32) [`6f7b65a`](https://github.com/statelyai/inspect/commit/6f7b65aff86320575e626e769bb7baf4a20b7669) Thanks [@davidkpiano](https://github.com/davidkpiano)! - Added new options `sanitizeContext` and `sanitizeEvent` to the inspector configuration. These options allow users to sanitize sensitive data from the context and events before they are sent to the inspector, and also to remove non-serializable data.
+
+  Example usage:
+
+  ```typescript
+  const inspector = createInspector({
+    sanitizeContext: (context) => {
+      // Remove sensitive data from context
+      const { password, ...safeContext } = context;
+      return safeContext;
+    },
+    sanitizeEvent: (event) => {
+      // Remove sensitive data from event
+      if (event.type === "SUBMIT_FORM") {
+        const { creditCardNumber, ...safeEvent } = event;
+        return safeEvent;
+      }
+      return event;
+    },
+  });
+  ```
+
 ## 0.3.1
 
 ### Patch Changes
