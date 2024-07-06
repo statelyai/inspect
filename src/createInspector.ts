@@ -7,7 +7,13 @@ import {
 } from './types';
 import { toEventObject } from './utils';
 import { Inspector } from './types';
-import { AnyActorRef, InspectionEvent, Snapshot } from 'xstate';
+import {
+  AnyActorRef,
+  AnyEventObject,
+  InspectionEvent,
+  MachineContext,
+  Snapshot,
+} from 'xstate';
 import pkg from '../package.json';
 import { idleCallback } from './idleCallback';
 import safeStringify from 'safe-stable-stringify';
@@ -40,7 +46,23 @@ export interface InspectorOptions {
    * @default true
    */
   autoStart?: boolean;
+  /**
+   * The maximum number of deferred events to hold in memory until the inspector is active.
+   * If the number of deferred events exceeds this number, the oldest events will be dropped.
+   *
+   * @default 200
+   */
   maxDeferredEvents?: number;
+
+  /**
+   * Sanitizes events sent to actors. Only the sanitized event will be sent to the inspector.
+   */
+  sanitizeEvent?: (event: AnyEventObject) => AnyEventObject;
+
+  /**
+   * Sanitizes actor snapshot context. Only the sanitized context will be sent to the inspector.
+   */
+  sanitizeContext?: (context: MachineContext) => MachineContext;
 }
 
 export const defaultInspectorOptions: Required<InspectorOptions> = {
@@ -48,21 +70,50 @@ export const defaultInspectorOptions: Required<InspectorOptions> = {
   serialize: (event) => event,
   autoStart: true,
   maxDeferredEvents: 200,
+  sanitizeEvent: (event) => event,
+  sanitizeContext: (context) => context,
 };
 
 export function createInspector<TAdapter extends Adapter>(
   adapter: TAdapter,
   options?: InspectorOptions
 ): Inspector<TAdapter> {
-  function sendAdapter(event: StatelyInspectionEvent): void {
-    if (options?.filter && !options.filter(event)) {
+  function sendAdapter(inspectionEvent: StatelyInspectionEvent): void {
+    if (options?.filter && !options.filter(inspectionEvent)) {
       // Event filtered out
       return;
     }
-    const serializedEvent = options?.serialize?.(event) ?? event;
-    // idleCallback(() => {
+
+    const sanitizedEvent: typeof inspectionEvent =
+      options?.sanitizeContext || options?.sanitizeEvent
+        ? inspectionEvent
+        : {
+            ...inspectionEvent,
+          };
+    if (
+      options?.sanitizeContext &&
+      (sanitizedEvent.type === '@xstate.actor' ||
+        sanitizedEvent.type === '@xstate.snapshot')
+    ) {
+      sanitizedEvent.snapshot = {
+        ...sanitizedEvent.snapshot,
+        // @ts-ignore
+        context: options.sanitizeContext(
+          // @ts-ignore
+          sanitizedEvent.snapshot.context
+        ),
+      };
+    }
+    if (
+      options?.sanitizeEvent &&
+      (sanitizedEvent.type === '@xstate.event' ||
+        sanitizedEvent.type === '@xstate.snapshot')
+    ) {
+      sanitizedEvent.event = options.sanitizeEvent(sanitizedEvent.event);
+    }
+    const serializedEvent =
+      options?.serialize?.(sanitizedEvent) ?? sanitizedEvent;
     adapter.send(serializedEvent);
-    // })
   }
   const inspector: Inspector<TAdapter> = {
     adapter,
