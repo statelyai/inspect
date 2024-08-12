@@ -11,7 +11,7 @@
     "xstate": "^5.17.1"
   },
   "name": "@statelyai/inspect",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Inspection utilities for state, actors, workflows, and state machines.",
   "main": "dist/index.js",
   "repository": "https://github.com/statelyai/inspect.git",
