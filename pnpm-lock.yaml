@@ -52,8 +52,8 @@ importers:
         specifier: ^1.6.0
         version: 1.6.0(@types/node@22.2.0)(jsdom@23.2.0)
       xstate:
-        specifier: ^5.17.1
-        version: 5.17.1
+        specifier: ^5.18.1
+        version: 5.18.1
 
 packages:
 
@@ -1696,8 +1696,8 @@ packages:
   xmlchars@2.2.0:
     resolution: {integrity: sha512-JZnDKK8B0RCDw84FNdDAIpZK+JuJw+s7Lz8nksI7SIuU3UXJJslUthsi+uWBUYOwPFwW7W7PRLRfUKpxjtjFCw==, tarball: https://registry.npmjs.org/xmlchars/-/xmlchars-2.2.0.tgz}
 
-  xstate@5.17.1:
-    resolution: {integrity: sha512-RNwcXdth+kboWZg+Zhf6f6iNP6CtAAiS4z4qwyTd/fWBH9PHXRqko6OdW3xOTwP62f0mVD+jsPOSqY4Ar8nZKQ==, tarball: https://registry.npmjs.org/xstate/-/xstate-5.17.1.tgz}
+  xstate@5.18.1:
+    resolution: {integrity: sha512-m02IqcCQbaE/kBQLunwub/5i8epvkD2mFutnL17Oeg1eXTShe1sRF4D5mhv1dlaFO4vbW5gRGRhraeAD5c938g==, tarball: https://registry.npmjs.org/xstate/-/xstate-5.18.1.tgz}
 
   yallist@2.1.2:
     resolution: {integrity: sha512-ncTzHV7NvsQZkYe1DW7cbDLm0YpzHmZF5r/iyP3ZnQtMiJ+pjzisCiMNI+Sj+xQF5pXhSHxSB3uDbsBTzY/c2A==, tarball: https://registry.npmjs.org/yallist/-/yallist-2.1.2.tgz}
@@ -3298,7 +3298,7 @@ snapshots:
 
   xmlchars@2.2.0: {}
 
-  xstate@5.17.1: {}
+  xstate@5.18.1: {}
 
   yallist@2.1.2: {}
 

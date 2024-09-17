@@ -1,5 +1,5 @@
 import {
-  AnyActorRef,
+  ActorRefLike,
   AnyEventObject,
   InspectionEvent,
   Observer,
@@ -63,7 +63,7 @@ export interface Inspector<TAdapter extends Adapter> {
    * Sends a snapshot inspection event. This represents the state of the actor.
    */
   snapshot(
-    actor: AnyActorRef | string,
+    actor: ActorRefLikeWithData | string,
     snapshot: InspectedSnapshot,
     info?: { event?: AnyEventObject }
   ): void;
@@ -71,15 +71,15 @@ export interface Inspector<TAdapter extends Adapter> {
    * Sends an event inspection event. This represents the event that was sent to the actor.
    */
   event(
-    actor: AnyActorRef | string,
+    actor: ActorRefLikeWithData | string,
     event: AnyEventObject | string,
-    info?: { source?: AnyActorRef | string }
+    info?: { source?: ActorRefLikeWithData | string }
   ): void;
   /**
    * Sends an actor registration inspection event. This represents the actor that was created.
    */
   actor(
-    actor: AnyActorRef | string,
+    actor: ActorRefLikeWithData | string,
     snapshot?: InspectedSnapshot,
     info?: {
       definition?: string;
@@ -112,3 +112,8 @@ export interface Inspector<TAdapter extends Adapter> {
    */
   inspect: Observer<InspectionEvent>;
 }
+
+export type ActorRefLikeWithData = ActorRefLike & {
+  _parent?: ActorRefLikeWithData;
+  id?: string;
+};
