@@ -1,5 +1,11 @@
 # @statelyai/inspect
 
+## 0.5.2
+
+### Patch Changes
+
+- [#39](https://github.com/statelyai/inspect/pull/39) [`70430ee`](https://github.com/statelyai/inspect/commit/70430eeffc11fb43a0bcabbb9d1d7737961160c0) Thanks [@davidkpiano](https://github.com/davidkpiano)! - Update XState to 5.18.2
+
 ## 0.5.1
 
 ### Patch Changes
