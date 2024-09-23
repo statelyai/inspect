@@ -4,11 +4,12 @@ import {
   StatelyInspectionEvent,
   StatelySnapshotEvent,
   Adapter,
+  ActorRefLikeWithData,
 } from './types';
 import { toEventObject } from './utils';
 import { Inspector } from './types';
 import {
-  AnyActorRef,
+  ActorRefLike,
   AnyEventObject,
   InspectionEvent,
   MachineContext,
@@ -18,8 +19,8 @@ import pkg from '../package.json';
 import { idleCallback } from './idleCallback';
 import safeStringify from 'safe-stable-stringify';
 
-function getRoot(actorRef: AnyActorRef) {
-  let marker: AnyActorRef | undefined = actorRef;
+function getRoot(actorRef: ActorRefLike) {
+  let marker: ActorRefLikeWithData | undefined = actorRef;
 
   do {
     marker = marker._parent;
@@ -28,7 +29,7 @@ function getRoot(actorRef: AnyActorRef) {
   return marker;
 }
 
-function getRootId(actorRefOrId: AnyActorRef | string): string | undefined {
+function getRootId(actorRefOrId: ActorRefLike | string): string | undefined {
   const rootActorRef =
     typeof actorRefOrId === 'string'
       ? undefined
@@ -210,7 +211,7 @@ export function convertXStateEvent(
       const actorRef = inspectionEvent.actorRef;
       const logic = (actorRef as any)?.logic;
       const definitionObject = logic?.config;
-      let name = actorRef.id;
+      let name = (actorRef as any).id;
 
       // TODO: fix this in XState
       if (name === actorRef.sessionId && definitionObject) {
@@ -237,7 +238,7 @@ export function convertXStateEvent(
         createdAt: Date.now().toString(),
         id: null as any,
         rootId: inspectionEvent.rootId,
-        parentId: inspectionEvent.actorRef._parent?.sessionId,
+        parentId: (inspectionEvent.actorRef as any)._parent?.sessionId,
         sessionId: inspectionEvent.actorRef.sessionId,
         snapshot: inspectionEvent.actorRef.getSnapshot(),
       } satisfies StatelyActorEvent;

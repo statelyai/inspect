@@ -8,7 +8,7 @@
     "tsup": "^8.2.4",
     "typescript": "^5.5.4",
     "vitest": "^1.6.0",
-    "xstate": "^5.17.1"
+    "xstate": "^5.18.2"
   },
   "name": "@statelyai/inspect",
   "version": "0.5.1",
@@ -36,7 +36,8 @@
     "changeset": "changeset",
     "release": "changeset publish",
     "version": "changeset version",
-    "dev": "yarn build && ./scripts/dev.sh"
+    "dev": "yarn build && ./scripts/dev.sh",
+    "typecheck": "tsc --noEmit"
   },
   "publishConfig": {
     "access": "public"
