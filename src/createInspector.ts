@@ -96,8 +96,8 @@ export function createInspector<TAdapter extends Adapter>(
       (sanitizedEvent.type === '@xstate.actor' ||
         sanitizedEvent.type === '@xstate.snapshot')
     ) {
-      sanitizedEvent.snapshot = {
-        ...sanitizedEvent.snapshot,
+      (sanitizedEvent as StatelySnapshotEvent).snapshot = {
+        ...(sanitizedEvent as StatelySnapshotEvent).snapshot,
         // @ts-ignore
         context: options.sanitizeContext(
           // @ts-ignore
@@ -110,7 +110,9 @@ export function createInspector<TAdapter extends Adapter>(
       (sanitizedEvent.type === '@xstate.event' ||
         sanitizedEvent.type === '@xstate.snapshot')
     ) {
-      sanitizedEvent.event = options.sanitizeEvent(sanitizedEvent.event);
+      (sanitizedEvent as StatelyEventEvent).event = options.sanitizeEvent(
+        (sanitizedEvent as StatelyEventEvent).event
+      );
     }
     const serializedEvent =
       options?.serialize?.(sanitizedEvent) ?? sanitizedEvent;
@@ -183,7 +185,7 @@ export function createInspector<TAdapter extends Adapter>(
       });
     },
     inspect: {
-      next: (event) => {
+      next: (event: InspectionEvent) => {
         idleCallback(function inspectNext() {
           const convertedEvent = convertXStateEvent(event);
           if (convertedEvent) {
@@ -201,6 +203,32 @@ export function createInspector<TAdapter extends Adapter>(
   };
 
   return inspector;
+}
+
+function deepCopyAndPrepareForSafeStringify(
+  obj: any,
+  hash = new WeakMap()
+): any {
+  if (typeof obj === 'bigint') return obj.toString();
+  if (obj === null || typeof obj !== 'object') {
+    return obj;
+  }
+  if (typeof HTMLElement !== 'undefined' && obj instanceof HTMLElement) {
+    return obj.outerHTML;
+  }
+  // check circulare
+  if (hash.has(obj)) {
+    return hash.get(obj);
+  }
+
+  const copy = Array.isArray(obj) ? ([] as any[]) : ({} as any);
+  hash.set(obj, copy);
+  for (const key in obj) {
+    if (Object.prototype.hasOwnProperty.call(obj, key)) {
+      copy[key] = deepCopyAndPrepareForSafeStringify(obj[key], hash);
+    }
+  }
+  return copy;
 }
 
 export function convertXStateEvent(
@@ -240,13 +268,15 @@ export function convertXStateEvent(
         rootId: inspectionEvent.rootId,
         parentId: (inspectionEvent.actorRef as any)._parent?.sessionId,
         sessionId: inspectionEvent.actorRef.sessionId,
-        snapshot: inspectionEvent.actorRef.getSnapshot(),
+        snapshot: deepCopyAndPrepareForSafeStringify(
+          inspectionEvent.actorRef.getSnapshot()
+        ),
       } satisfies StatelyActorEvent;
     }
     case '@xstate.event': {
       return {
         type: '@xstate.event',
-        event: inspectionEvent.event,
+        event: deepCopyAndPrepareForSafeStringify(inspectionEvent.event),
         sourceId: inspectionEvent.sourceRef?.sessionId,
         // sessionId: inspectionEvent.targetRef.sessionId,
         sessionId: inspectionEvent.actorRef.sessionId,
@@ -259,8 +289,13 @@ export function convertXStateEvent(
     case '@xstate.snapshot': {
       return {
         type: '@xstate.snapshot',
-        event: inspectionEvent.event,
-        snapshot: JSON.parse(safeStringify(inspectionEvent.snapshot)),
+        event: deepCopyAndPrepareForSafeStringify(inspectionEvent.event),
+        // fix: bigint and html element serialize bug
+        snapshot: JSON.parse(
+          safeStringify(
+            deepCopyAndPrepareForSafeStringify(inspectionEvent.snapshot)
+          ) ?? ''
+        ),
         sessionId: inspectionEvent.actorRef.sessionId,
         _version: pkg.version,
         createdAt: Date.now().toString(),
