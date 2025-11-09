@@ -57,11 +57,20 @@ export function createBrowserInspector(
     return new UselessAdapter() as any;
   }
 
+  const depthLimit =
+    options?.serializationDepthLimit ??
+    defaultInspectorOptions.serializationDepthLimit;
   const resolvedOptions = {
     ...defaultInspectorOptions,
     url: 'https://stately.ai/inspect',
     filter: () => true,
-    serialize: (inspectionEvent) => JSON.parse(safeStringify(inspectionEvent)),
+    serialize: (inspectionEvent) =>
+      JSON.parse(
+        safeStringify(inspectionEvent, undefined, 2, {
+          depthLimit,
+          edgesLimit: depthLimit,
+        })
+      ),
     autoStart: true,
     iframe: null,
     ...options,
