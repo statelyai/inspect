@@ -1,5 +1,11 @@
 # @statelyai/inspect
 
+## 0.6.0
+
+### Minor Changes
+
+- [#48](https://github.com/statelyai/inspect/pull/48) [`e1e45ed`](https://github.com/statelyai/inspect/commit/e1e45edcfbd0c99d4b672a3ecbbbfec8aa051613) Thanks [@davidkpiano](https://github.com/davidkpiano)! - Fixed DOM serialization issues that could cause the inspector to freeze when HTML elements or deeply nested structures were included in state context. Added `serializationDepthLimit` option (default: 10) to prevent infinite recursion during serialization. HTMLElement instances are now safely converted to their `outerHTML` string representation.
+
 ## 0.5.2
 
 ### Patch Changes
