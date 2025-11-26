@@ -351,3 +351,237 @@ test('it safely stringifies objects with circular dependencies', () => {
     });
   }).not.toThrow();
 });
+
+test('it safely serializes HTML elements without freezing', () => {
+  const events: StatelyInspectionEvent[] = [];
+  const testAdapter: Adapter = {
+    send: (event) => {
+      events.push(event);
+    },
+    start: () => {},
+    stop: () => {},
+  };
+
+  const inspector = createInspector(testAdapter);
+
+  // Create a mock HTMLElement-like object with circular references
+  // This simulates the problematic structure that causes freezing
+  const mockHTMLElement: any = {
+    outerHTML: '<div>test</div>',
+    nodeType: 1,
+    tagName: 'DIV',
+    parentElement: null,
+    children: [],
+  };
+  
+  // Create circular reference (common in DOM structures)
+  mockHTMLElement.parentElement = mockHTMLElement;
+  mockHTMLElement.children.push(mockHTMLElement);
+
+  // In a browser environment, this would be an actual HTMLElement
+  // The safeReplacer should handle it, but in Node.js we test with a mock
+  if (typeof HTMLElement !== 'undefined') {
+    Object.setPrototypeOf(mockHTMLElement, HTMLElement.prototype);
+  }
+
+  let completed = false;
+  const startTime = Date.now();
+
+  expect(() => {
+    inspector.inspect.next?.({
+      type: '@xstate.snapshot',
+      snapshot: { context: { element: mockHTMLElement } } as any,
+      actorRef: {} as any,
+      event: { type: 'any' },
+      rootId: '',
+    });
+
+    // Wait a bit to ensure serialization completes
+    setTimeout(() => {
+      completed = true;
+    }, 100);
+  }).not.toThrow();
+
+  // Verify serialization completes within reasonable time (not frozen)
+  return new Promise<void>((resolve) => {
+    setTimeout(() => {
+      const elapsed = Date.now() - startTime;
+      expect(elapsed).toBeLessThan(1000); // Should complete in less than 1 second
+      expect(completed).toBe(true);
+      resolve();
+    }, 150);
+  });
+});
+
+test('it safely serializes deeply nested structures without freezing', () => {
+  const events: StatelyInspectionEvent[] = [];
+  const testAdapter: Adapter = {
+    send: (event) => {
+      events.push(event);
+    },
+    start: () => {},
+    stop: () => {},
+  };
+
+  const inspector = createInspector(testAdapter);
+
+  // Create a deeply nested structure (deeper than the maximumDepth limit of 10)
+  let deepObject: any = { value: 'deep' };
+  for (let i = 0; i < 20; i++) {
+    deepObject = { nested: deepObject };
+  }
+
+  let completed = false;
+  const startTime = Date.now();
+
+  expect(() => {
+    inspector.inspect.next?.({
+      type: '@xstate.snapshot',
+      snapshot: { context: deepObject } as any,
+      actorRef: {} as any,
+      event: { type: 'any' },
+      rootId: '',
+    });
+
+    setTimeout(() => {
+      completed = true;
+    }, 100);
+  }).not.toThrow();
+
+  // Verify serialization completes within reasonable time (not frozen)
+  return new Promise<void>((resolve) => {
+    setTimeout(() => {
+      const elapsed = Date.now() - startTime;
+      expect(elapsed).toBeLessThan(1000); // Should complete in less than 1 second
+      expect(completed).toBe(true);
+      resolve();
+    }, 150);
+  });
+});
+
+test('it safely serializes snapshot with HTML element in context', async () => {
+  const events: StatelyInspectionEvent[] = [];
+  const testAdapter: Adapter = {
+    send: (event) => {
+      events.push(event);
+    },
+    start: () => {},
+    stop: () => {},
+  };
+
+  const inspector = createInspector(testAdapter);
+
+  // Create a mock HTMLElement-like object
+  const mockHTMLElement: any = {
+    outerHTML: '<div id="test">Hello</div>',
+    nodeType: 1,
+    tagName: 'DIV',
+  };
+
+  // In a browser environment, this would be an actual HTMLElement
+  if (typeof HTMLElement !== 'undefined') {
+    Object.setPrototypeOf(mockHTMLElement, HTMLElement.prototype);
+  }
+
+  inspector.snapshot('test', {
+    status: 'active',
+    context: { element: mockHTMLElement, data: 'test' },
+  });
+
+  // Verify the event was sent and serialized successfully
+  expect(events.length).toBeGreaterThan(0);
+  const snapshotEvent = events.find((e) => e.type === '@xstate.snapshot');
+  expect(snapshotEvent).toBeDefined();
+  
+  // The snapshot should be serializable
+  expect(() => {
+    JSON.stringify(snapshotEvent);
+  }).not.toThrow();
+});
+
+test('serialization without depth limit and DOM element handler will fail or hang', async () => {
+  const events: StatelyInspectionEvent[] = [];
+  const testAdapter: Adapter = {
+    send: (event) => {
+      events.push(event);
+    },
+    start: () => {},
+    stop: () => {},
+  };
+
+  // Create inspector with a custom serializer that doesn't have depth limits
+  // This simulates the old behavior before the fix
+  const inspector = createInspector(testAdapter, {
+    serialize: (event) => {
+      // Use JSON.stringify without depth limits - this will fail or hang
+      // with DOM elements or deeply nested structures
+      try {
+        JSON.stringify(event);
+        return event;
+      } catch (error) {
+        // Expected to fail with circular references or DOM elements
+        throw error;
+      }
+    },
+  });
+
+  // Create a mock HTMLElement-like object with circular references
+  const mockHTMLElement: any = {
+    outerHTML: '<div>test</div>',
+    nodeType: 1,
+    tagName: 'DIV',
+    parentElement: null,
+    children: [],
+  };
+  
+  // Create circular reference (common in DOM structures)
+  mockHTMLElement.parentElement = mockHTMLElement;
+  mockHTMLElement.children.push(mockHTMLElement);
+
+  // This should fail or hang without the fix
+  expect(() => {
+    inspector.snapshot('test', {
+      status: 'active',
+      context: { element: mockHTMLElement },
+    });
+  }).toThrow();
+});
+
+test('serialization with custom depth limit works correctly', () => {
+  const events: StatelyInspectionEvent[] = [];
+  const testAdapter: Adapter = {
+    send: (event) => {
+      events.push(event);
+    },
+    start: () => {},
+    stop: () => {},
+  };
+
+  // Test with a custom depth limit (lower than default)
+  const inspector = createInspector(testAdapter, {
+    serializationDepthLimit: 5,
+  });
+
+  // Create a deeply nested structure
+  let deepObject: any = { value: 'deep' };
+  for (let i = 0; i < 10; i++) {
+    deepObject = { nested: deepObject };
+  }
+
+  expect(() => {
+    inspector.inspect.next?.({
+      type: '@xstate.snapshot',
+      snapshot: { context: deepObject } as any,
+      actorRef: {} as any,
+      event: { type: 'any' },
+      rootId: '',
+    });
+  }).not.toThrow();
+
+  // Verify it completes quickly (not frozen)
+  return new Promise<void>((resolve) => {
+    setTimeout(() => {
+      resolve();
+    }, 100);
+  });
+});

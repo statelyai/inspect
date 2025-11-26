@@ -17,7 +17,32 @@ import {
 } from 'xstate';
 import pkg from '../package.json';
 import { idleCallback } from './idleCallback';
-import safeStringify from 'safe-stable-stringify';
+import safeStableStringify from 'safe-stable-stringify';
+
+// Helper function to safely handle HTMLElement instances during serialization
+function safeReplacer(_key: string, value: any): any {
+  // Handle HTMLElement instances safely (only in browser environments)
+  if (
+    typeof HTMLElement !== 'undefined' &&
+    value &&
+    typeof value === 'object' &&
+    value instanceof HTMLElement
+  ) {
+    return value.outerHTML;
+  }
+  // Handle functions
+  if (typeof value === 'function') {
+    return { type: value.name };
+  }
+  return value;
+}
+
+// Helper function to create a configured safe stringify function with depth limit
+function createSafeStringify(depthLimit: number) {
+  return safeStableStringify.configure({
+    maximumDepth: depthLimit,
+  });
+}
 
 function getRoot(actorRef: ActorRefLike) {
   let marker: ActorRefLikeWithData | undefined = actorRef;
@@ -56,6 +81,15 @@ export interface InspectorOptions {
   maxDeferredEvents?: number;
 
   /**
+   * Maximum depth for serialization. Prevents infinite recursion when serializing
+   * HTML elements or deeply nested structures. Lower values provide better performance
+   * but may truncate deeply nested data.
+   *
+   * @default 10
+   */
+  serializationDepthLimit?: number;
+
+  /**
    * Sanitizes events sent to actors. Only the sanitized event will be sent to the inspector.
    */
   sanitizeEvent?: (event: AnyEventObject) => AnyEventObject;
@@ -71,6 +105,7 @@ export const defaultInspectorOptions: Required<InspectorOptions> = {
   serialize: (event) => event,
   autoStart: true,
   maxDeferredEvents: 200,
+  serializationDepthLimit: 10,
   sanitizeEvent: (event) => event,
   sanitizeContext: (context) => context,
 };
@@ -79,6 +114,11 @@ export function createInspector<TAdapter extends Adapter>(
   adapter: TAdapter,
   options?: InspectorOptions
 ): Inspector<TAdapter> {
+  const depthLimit =
+    options?.serializationDepthLimit ??
+    defaultInspectorOptions.serializationDepthLimit;
+  const safeStringify = createSafeStringify(depthLimit);
+
   function sendAdapter(inspectionEvent: StatelyInspectionEvent): void {
     if (options?.filter && !options.filter(inspectionEvent)) {
       // Event filtered out
@@ -123,7 +163,7 @@ export function createInspector<TAdapter extends Adapter>(
         typeof actorRef === 'string' ? actorRef : actorRef.sessionId;
       const definitionObject = (actorRef as any)?.logic?.config;
       const definition = definitionObject
-        ? safeStringify(definitionObject)
+        ? safeStringify(definitionObject, safeReplacer)
         : undefined;
       const rootId =
         info?.rootId ?? typeof actorRef === 'string'
@@ -185,7 +225,7 @@ export function createInspector<TAdapter extends Adapter>(
     inspect: {
       next: (event) => {
         idleCallback(function inspectNext() {
-          const convertedEvent = convertXStateEvent(event);
+          const convertedEvent = convertXStateEvent(event, depthLimit);
           if (convertedEvent) {
             sendAdapter(convertedEvent);
           }
@@ -204,8 +244,11 @@ export function createInspector<TAdapter extends Adapter>(
 }
 
 export function convertXStateEvent(
-  inspectionEvent: InspectionEvent
+  inspectionEvent: InspectionEvent,
+  depthLimit: number = defaultInspectorOptions.serializationDepthLimit
 ): StatelyInspectionEvent | undefined {
+  const safeStringify = createSafeStringify(depthLimit);
+
   switch (inspectionEvent.type) {
     case '@xstate.actor': {
       const actorRef = inspectionEvent.actorRef;
@@ -219,16 +262,13 @@ export function convertXStateEvent(
       }
       const definitionString =
         typeof definitionObject === 'object'
-          ? safeStringify(definitionObject, (_key, value) => {
-              if (typeof value === 'function') {
-                return { type: value.name };
-              }
-
-              return value;
-            })
-          : safeStringify({
-              id: name,
-            });
+          ? safeStringify(definitionObject, safeReplacer)
+          : safeStringify(
+              {
+                id: name,
+              },
+              safeReplacer
+            );
 
       return {
         name,
@@ -260,7 +300,9 @@ export function convertXStateEvent(
       return {
         type: '@xstate.snapshot',
         event: inspectionEvent.event,
-        snapshot: JSON.parse(safeStringify(inspectionEvent.snapshot)),
+        snapshot: JSON.parse(
+          safeStringify(inspectionEvent.snapshot, safeReplacer) ?? 'null'
+        ),
         sessionId: inspectionEvent.actorRef.sessionId,
         _version: pkg.version,
         createdAt: Date.now().toString(),
