@@ -12,7 +12,7 @@
     "xstate": "^5.30.0"
   },
   "name": "@statelyai/inspect",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "Inspection utilities for state, actors, workflows, and state machines.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
