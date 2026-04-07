@@ -1,5 +1,16 @@
 # @statelyai/inspect
 
+## 0.7.0
+
+### Minor Changes
+
+- [#50](https://github.com/statelyai/inspect/pull/50) [`5c9a711`](https://github.com/statelyai/inspect/commit/5c9a7112150093e3e900e930ceba657c2c8317b6) Thanks [@davidkpiano](https://github.com/davidkpiano)! - Add `createInspectorServer()` for inspecting Node.js apps via WebSocket. Import from `@statelyai/inspect/server`. The server relays inspection events to the Stately inspector UI in the browser.
+
+  - Add `createInspectorServer()` with event buffering and replay
+  - Fix `createWebSocketInspector()` not auto-starting the WebSocket connection
+  - Fix `stop()` crash when called before `start()`
+  - Remove noisy `console.log` calls from WebSocket adapter and receiver
+
 ## 0.6.0
 
 ### Minor Changes
