@@ -13,7 +13,7 @@ export interface WebSocketInspectorOptions extends InspectorOptions {
 }
 
 export class WebSocketAdapter implements Adapter {
-  private ws: WebSocket;
+  private ws!: WebSocket;
   private status = 'closed' as 'closed' | 'open';
   private deferredEvents: StatelyInspectionEvent[] = [];
   private options: Required<WebSocketInspectorOptions>;
@@ -40,7 +40,6 @@ export class WebSocketAdapter implements Adapter {
       this.ws = new WebSocket(this.options.url);
 
       this.ws.onopen = () => {
-        console.log('websocket open');
         this.status = 'open';
         this.deferredEvents.forEach((inspectionEvent) => {
           const preSerializedEvent =
@@ -51,29 +50,26 @@ export class WebSocketAdapter implements Adapter {
       };
 
       this.ws.onclose = () => {
-        console.log('websocket closed');
+        this.status = 'closed';
       };
 
-      this.ws.onerror = async (event: unknown) => {
-        console.error('websocket error', event);
+      this.ws.onerror = async () => {
+        this.status = 'closed';
         await new Promise((res) => setTimeout(res, 5000));
-        console.warn('restarting');
         start();
       };
 
-      this.ws.onmessage = (event: { data: unknown }) => {
-        if (typeof event.data !== 'string') {
-          return;
-        }
-
-        console.log('message', event.data);
+      this.ws.onmessage = () => {
+        // Messages from the server are ignored by the adapter
       };
     };
 
     start();
   }
   public stop() {
-    this.ws.close();
+    if (this.ws) {
+      this.ws.close();
+    }
     this.status = 'closed';
   }
   public send(inspectionEvent: StatelyInspectionEvent) {
@@ -94,6 +90,10 @@ export function createWebSocketInspector(options?: WebSocketInspectorOptions) {
 
   const inspector = createInspector(adapter, options);
 
+  if (options?.autoStart !== false) {
+    inspector.start();
+  }
+
   return inspector;
 }
 
@@ -112,13 +112,10 @@ export function createWebSocketReceiver(options?: {
   const ws = new WebSocket(resolvedOptions.server);
 
   ws.onopen = () => {
-    console.log('websocket open');
-
     ws.onmessage = (event: { data: unknown }) => {
       if (typeof event.data !== 'string') {
         return;
       }
-      console.log('message', event.data);
       const eventData = JSON.parse(event.data);
 
       observers.forEach((observer) => {

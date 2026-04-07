@@ -1,32 +1,47 @@
 const { createMachine, createActor } = require('xstate');
 const { createWebSocketInspector } = require('./dist/index.js');
+const { createInspectorServer } = require('./dist/server.js');
 
+// 1. Start the relay server (opens browser automatically)
+const server = createInspectorServer({ port: 8080 });
+
+// 2. Create the inspector, pointing at the relay server
+const inspector = createWebSocketInspector({
+  url: 'ws://localhost:8080',
+});
+
+// 3. Create a traffic light machine
 const machine = createMachine({
-  // a machine that goes back and forth every second
-  id: 'counter',
-  initial: 'counting',
+  id: 'trafficLight',
+  initial: 'green',
   states: {
-    counting: {
+    green: {
       after: {
-        1000: 'not counting',
+        3000: 'yellow',
       },
     },
-    'not counting': {
+    yellow: {
       after: {
-        1000: 'counting',
+        1000: 'red',
+      },
+    },
+    red: {
+      after: {
+        3000: 'green',
       },
     },
   },
 });
 
-const actor = createActor(machine);
-
-const inspector = createWebSocketInspector('ws://localhost:8080');
-
-actor.subscribe((state) => {
-  inspector.snapshot(state, actor.sessionId);
-  inspector.actor('some actor');
-  inspector.event('EVENT');
+const actor = createActor(machine, {
+  inspect: inspector.inspect,
 });
 
 actor.start();
+
+// Stop after 30 seconds
+setTimeout(() => {
+  actor.stop();
+  inspector.stop();
+  server.stop();
+}, 30_000);
