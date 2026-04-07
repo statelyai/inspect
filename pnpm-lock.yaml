@@ -10,7 +10,7 @@ dependencies:
     version: 2.1.1
   isomorphic-ws:
     specifier: ^5.0.0
-    version: 5.0.0(ws@8.18.3)
+    version: 5.0.0(ws@8.20.0)
   partysocket:
     specifier: ^0.0.25
     version: 0.0.25
@@ -23,6 +23,9 @@ dependencies:
   uuid:
     specifier: ^9.0.1
     version: 9.0.1
+  ws:
+    specifier: ^8.20.0
+    version: 8.20.0
 
 devDependencies:
   '@changesets/changelog-github':
@@ -37,6 +40,9 @@ devDependencies:
   '@types/uuid':
     specifier: ^9.0.8
     version: 9.0.8
+  '@types/ws':
+    specifier: ^8.18.1
+    version: 8.18.1
   jsdom:
     specifier: ^23.2.0
     version: 23.2.0
@@ -50,8 +56,8 @@ devDependencies:
     specifier: ^1.6.1
     version: 1.6.1(jsdom@23.2.0)
   xstate:
-    specifier: ^5.24.0
-    version: 5.24.0
+    specifier: ^5.30.0
+    version: 5.30.0
 
 packages:
 
@@ -1075,6 +1081,12 @@ packages:
     resolution: {integrity: sha512-jg+97EGIcY9AGHJJRaaPVgetKDsrTgbRjQ5Msgjh/DQKEFl0DtyRr/VCOyD1T2R1MNeWPK/u7JoGhlDZnKBAfA==, tarball: https://registry.npmjs.org/@types/uuid/-/uuid-9.0.8.tgz}
     dev: true
 
+  /@types/ws@8.18.1:
+    resolution: {integrity: sha512-ThVF6DCVhA8kUGy+aazFQ4kXQ7E1Ty7A3ypFOe0IcJV8O/M511G99AW24irKrW56Wt44yG9+ij8FaqoBGkuBXg==, tarball: https://registry.npmjs.org/@types/ws/-/ws-8.18.1.tgz}
+    dependencies:
+      '@types/node': 24.10.0
+    dev: true
+
   /@vitest/expect@1.6.1:
     resolution: {integrity: sha512-jXL+9+ZNIJKruofqXuuTClf44eSpcHlgj3CiuNihUF3Ioujtmc0zIa3UJOW5RjDK1YLBJZnWBlPuqhYycLioog==, tarball: https://registry.npmjs.org/@vitest/expect/-/expect-1.6.1.tgz}
     dependencies:
@@ -1868,12 +1880,12 @@ packages:
     resolution: {integrity: sha512-RHxMLp9lnKHGHRng9QFhRCMbYAcVpn69smSGcq3f36xjgVVWThj4qqLbTLlq7Ssj8B+fIQ1EuCEGI2lKsyQeIw==, tarball: https://registry.npmjs.org/isexe/-/isexe-2.0.0.tgz}
     dev: true
 
-  /isomorphic-ws@5.0.0(ws@8.18.3):
+  /isomorphic-ws@5.0.0(ws@8.20.0):
     resolution: {integrity: sha512-muId7Zzn9ywDsyXgTIafTry2sV3nySZeUDe6YedVd1Hvuuep5AsIlqK+XefWpYTyJG5e503F2xIuT2lcU6rCSw==, tarball: https://registry.npmjs.org/isomorphic-ws/-/isomorphic-ws-5.0.0.tgz}
     peerDependencies:
       ws: '*'
     dependencies:
-      ws: 8.18.3
+      ws: 8.20.0
     dev: false
 
   /jackspeak@3.4.3:
@@ -1929,7 +1941,7 @@ packages:
       whatwg-encoding: 3.1.1
       whatwg-mimetype: 4.0.0
       whatwg-url: 14.2.0
-      ws: 8.18.3
+      ws: 8.20.0
       xml-name-validator: 5.0.0
     transitivePeerDependencies:
       - bufferutil
@@ -2934,8 +2946,8 @@ packages:
       strip-ansi: 7.1.2
     dev: true
 
-  /ws@8.18.3:
-    resolution: {integrity: sha512-PEIGCY5tSlUt50cqyMXfCzX+oOPqN0vuGqWzbcJ2xvnkzkq46oOpz7dQaTDBdfICb4N14+GARUDw2XV2N4tvzg==, tarball: https://registry.npmjs.org/ws/-/ws-8.18.3.tgz}
+  /ws@8.20.0:
+    resolution: {integrity: sha512-sAt8BhgNbzCtgGbt2OxmpuryO63ZoDk/sqaB/znQm94T4fCEsy/yV+7CdC1kJhOU9lboAEU7R3kquuycDoibVA==, tarball: https://registry.npmjs.org/ws/-/ws-8.20.0.tgz}
     engines: {node: '>=10.0.0'}
     peerDependencies:
       bufferutil: ^4.0.1
@@ -2955,8 +2967,8 @@ packages:
     resolution: {integrity: sha512-JZnDKK8B0RCDw84FNdDAIpZK+JuJw+s7Lz8nksI7SIuU3UXJJslUthsi+uWBUYOwPFwW7W7PRLRfUKpxjtjFCw==, tarball: https://registry.npmjs.org/xmlchars/-/xmlchars-2.2.0.tgz}
     dev: true
 
-  /xstate@5.24.0:
-    resolution: {integrity: sha512-h/213ThFfZbOefUWrLc9ZvYggEVBr0jrD2dNxErxNMLQfZRN19v+80TaXFho17hs8Q2E1mULtm/6nv12um0C4A==, tarball: https://registry.npmjs.org/xstate/-/xstate-5.24.0.tgz}
+  /xstate@5.30.0:
+    resolution: {integrity: sha512-mIzIuMjtYVkqXq9dUzYQoag7b/dF1CBS/yhliuPLfR0FwKPC18HiUivb/crcqY2gknhR8gJEhnppLg6ubQ0gGw==, tarball: https://registry.npmjs.org/xstate/-/xstate-5.30.0.tgz}
     dev: true
 
   /yocto-queue@1.2.1:
