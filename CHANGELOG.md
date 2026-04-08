@@ -1,5 +1,11 @@
 # @statelyai/inspect
 
+## 0.7.1
+
+### Patch Changes
+
+- [`e79da70`](https://github.com/statelyai/inspect/commit/e79da7019393c63e556fad8d44c67928cd83ee2c) Thanks [@davidkpiano](https://github.com/davidkpiano)! - Fix remove-node-module-import
+
 ## 0.7.0
 
 ### Minor Changes
