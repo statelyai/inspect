@@ -1,3 +1,4 @@
+import IsomorphicWebSocket from 'isomorphic-ws';
 import PartySocket from 'partysocket';
 import { stringify } from 'superjson';
 import { v4 as uuidv4 } from 'uuid';
@@ -32,7 +33,7 @@ export function createSkyInspector(
   const socket = new PartySocket({
     host,
     room,
-    WebSocket: isNode ? require('isomorphic-ws') : undefined,
+    WebSocket: isNode ? IsomorphicWebSocket : undefined,
   });
   const liveInspectUrl = `${server}/inspect/${sessionId}`;
   socket.onerror = onerror ?? console.error;
