@@ -2,7 +2,7 @@
   "name": "@statelyai/inspect",
   "packageManager": "pnpm@10.28.2",
   "type": "module",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "Inspection utilities for state, actors, workflows, and state machines.",
   "author": "David Khourshid <davidkpiano@gmail.com>",
   "license": "MIT",
@@ -17,7 +17,9 @@
   "main": "./dist/index.mjs",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.mts",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "exports": {
     ".": {
       "types": "./dist/index.d.mts",

@@ -4,6 +4,29 @@
 
 ### Minor Changes
 
+- [`bcb4666`](https://github.com/statelyai/inspect/commit/bcb4666edd555f25802de4979092585d95fb06d6) Thanks [@davidkpiano](https://github.com/davidkpiano)! - ### Breaking changes
+
+  - **ESM-only**: the package is now `"type": "module"` and ships `.mjs` / `.d.mts`. Use `import` / `import()` instead of `require()` for `@statelyai/inspect` and `@statelyai/inspect/server`.
+
+  ### Features
+
+  - Add **`createInspectorServer()`** for Node.js inspection via WebSocket; import from **`@statelyai/inspect/server`**. The server relays inspection events to the Stately inspector UI in the browser (with buffering and replay for late connections).
+
+  ### Fixes
+
+  - **`createWebSocketInspector()`** now starts the WebSocket connection reliably.
+  - **`stop()`** no longer throws if called before **`start()`**.
+  - Remove noisy **`console.log`** calls from the WebSocket adapter and receiver.
+
+  ### Chores
+
+  - Build with **tsdown** (Rolldown) instead of tsup; align tooling with **`@statelyai/graph`** (pnpm 10, Node 24 in CI, frozen lockfile, **`pnpm verify`**, **publint**).
+  - Release workflow uses **npm trusted publishing (OIDC)**; drop long-lived **`NPM_TOKEN`** from Actions.
+
+## 0.7.0
+
+### Minor Changes
+
 - [#50](https://github.com/statelyai/inspect/pull/50) [`5c9a711`](https://github.com/statelyai/inspect/commit/5c9a7112150093e3e900e930ceba657c2c8317b6) Thanks [@davidkpiano](https://github.com/davidkpiano)! - Add `createInspectorServer()` for inspecting Node.js apps via WebSocket. Import from `@statelyai/inspect/server`. The server relays inspection events to the Stately inspector UI in the browser.
 
   - Add `createInspectorServer()` with event buffering and replay
