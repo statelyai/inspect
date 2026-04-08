@@ -3,7 +3,7 @@ import { createInspector } from './createInspector';
 import { StatelyInspectionEvent, Adapter, StatelyEventEvent } from './types';
 import { createActor, createMachine } from 'xstate';
 import pkg from '../package.json';
-import { StatelyActorEvent } from '../dist';
+import { StatelyActorEvent } from './types';
 
 function simplifyEvent(ev: StatelyInspectionEvent) {
   return ev.type === '@xstate.actor'

@@ -1,34 +1,33 @@
 {
-  "devDependencies": {
-    "@changesets/changelog-github": "^0.5.1",
-    "@changesets/cli": "^2.29.7",
-    "@types/jsdom": "^21.1.7",
-    "@types/uuid": "^9.0.8",
-    "@types/ws": "^8.18.1",
-    "jsdom": "^23.2.0",
-    "tsup": "^8.5.0",
-    "typescript": "^5.9.3",
-    "vitest": "^1.6.1",
-    "xstate": "^5.30.0"
-  },
   "name": "@statelyai/inspect",
-  "version": "0.7.0",
+  "packageManager": "pnpm@10.28.2",
+  "type": "module",
+  "version": "0.6.0",
   "description": "Inspection utilities for state, actors, workflows, and state machines.",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "default": "./dist/index.js"
-    },
-    "./server": {
-      "types": "./dist/server.d.ts",
-      "default": "./dist/server.js"
-    }
-  },
-  "repository": "https://github.com/statelyai/inspect.git",
   "author": "David Khourshid <davidkpiano@gmail.com>",
   "license": "MIT",
+  "homepage": "https://github.com/statelyai/inspect#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/statelyai/inspect.git"
+  },
+  "bugs": {
+    "url": "https://github.com/statelyai/inspect/issues"
+  },
+  "main": "./dist/index.mjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
+  "files": ["dist"],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "default": "./dist/index.mjs"
+    },
+    "./server": {
+      "types": "./dist/server.d.mts",
+      "default": "./dist/server.mjs"
+    }
+  },
   "dependencies": {
     "fast-safe-stringify": "^2.1.1",
     "isomorphic-ws": "^5.0.0",
@@ -41,20 +40,34 @@
   "peerDependencies": {
     "xstate": "^5.5.1"
   },
+  "devDependencies": {
+    "@changesets/changelog-github": "^0.5.2",
+    "@changesets/cli": "^2.29.8",
+    "@types/jsdom": "^21.1.7",
+    "@types/uuid": "^9.0.8",
+    "@types/ws": "^8.18.1",
+    "jsdom": "^23.2.0",
+    "publint": "^0.3.15",
+    "tsdown": "^0.18.4",
+    "typescript": "^5.9.3",
+    "vitest": "^1.6.1",
+    "xstate": "^5.30.0"
+  },
   "scripts": {
-    "build": "tsup src/index.ts src/server.ts --dts",
-    "watch": "tsup src/index.ts src/server.ts --dts --watch",
+    "build": "tsdown",
+    "watch": "tsdown --watch",
     "test": "vitest",
-    "prepublishOnly": "tsup src/index.ts src/server.ts --dts",
+    "typecheck": "tsc --noEmit",
+    "verify": "pnpm typecheck && pnpm test -- --run && pnpm build && pnpm validate:package",
+    "validate:package": "publint",
+    "prepublishOnly": "pnpm run build",
     "changeset": "changeset",
-    "release": "changeset publish",
+    "release": "pnpm run build && changeset publish",
     "version": "changeset version",
-    "example": "node example.js",
-    "dev": "yarn build && ./scripts/dev.sh",
-    "typecheck": "tsc --noEmit"
+    "example": "node example.mjs",
+    "dev": "pnpm build && ./scripts/dev.sh"
   },
   "publishConfig": {
     "access": "public"
-  },
-  "packageManager": "pnpm@8.11.0"
+  }
 }

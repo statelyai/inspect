@@ -6,9 +6,15 @@ import {
   defaultInspectorOptions,
 } from './createInspector';
 import { Adapter, Inspector, StatelyInspectionEvent } from './types';
-import { UselessAdapter } from './useless';
 
 interface BrowserReceiver extends Subscribable<StatelyInspectionEvent> {}
+
+/** No-op adapter when `window` is unavailable (SSR / Node tests). */
+class NoOpBrowserAdapter implements Adapter {
+  start() {}
+  stop() {}
+  send(_event: StatelyInspectionEvent) {}
+}
 
 export const CONNECTION_EVENT = '@statelyai.connected';
 
@@ -54,7 +60,7 @@ export function createBrowserInspector(
   if (!resolvedWindow) {
     console.error('Window does not exist; inspector cannot be started.');
 
-    return new UselessAdapter() as any;
+    return new NoOpBrowserAdapter() as any;
   }
 
   const depthLimit =

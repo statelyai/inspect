@@ -7,29 +7,37 @@ on:
 
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
-permissions: {}
 jobs:
   release:
-    permissions:
-      contents: write  # to create release (changesets/action)
-      issues: write # to post issue comments (changesets/action)
-      pull-requests: write  # to create pull request (changesets/action)
-
-    if: github.repository == 'statelyai/inspect'
-
-    timeout-minutes: 20
-
+    name: Release
     runs-on: ubuntu-latest
-
+    permissions:
+      id-token: write # Required for npm Trusted Publishers (OIDC)
+      contents: write
+      pull-requests: write
     steps:
-      - uses: actions/checkout@v3
-      - uses: ./.github/actions/ci-setup
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Verify
+        run: pnpm verify
 
       - name: Create Release Pull Request or Publish to npm
+        id: changesets
         uses: changesets/action@v1
         with:
           publish: pnpm run release
-          version: pnpm run version
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

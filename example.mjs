@@ -1,6 +1,6 @@
-const { createMachine, createActor } = require('xstate');
-const { createWebSocketInspector } = require('./dist/index.js');
-const { createInspectorServer } = require('./dist/server.js');
+import { createMachine, createActor } from 'xstate';
+import { createWebSocketInspector } from './dist/index.mjs';
+import { createInspectorServer } from './dist/server.mjs';
 
 // 1. Start the relay server (opens browser automatically)
 const server = createInspectorServer({ port: 8080 });
