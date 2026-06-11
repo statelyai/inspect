@@ -5,6 +5,10 @@
     "moduleDetection": "force",
     "module": "preserve",
     "moduleResolution": "bundler",
+    "baseUrl": ".",
+    "paths": {
+      "#uuid": ["./src/uuid-node.ts"]
+    },
     "resolveJsonModule": true,
     "strict": true,
     "esModuleInterop": true,

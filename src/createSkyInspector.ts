@@ -1,7 +1,7 @@
 import IsomorphicWebSocket from 'isomorphic-ws';
 import PartySocket from 'partysocket';
 import { stringify } from 'superjson';
-import { v4 as uuidv4 } from 'uuid';
+import { uuid } from '#uuid';
 import { createBrowserInspector } from './browser';
 import {
   InspectorOptions,
@@ -28,7 +28,7 @@ export function createSkyInspector(
   };
   const server = apiBaseURL.replace('/api/sky', '');
   const { apiKey, onerror, ...inspectorOptions } = options;
-  const sessionId = uuidv4(); // Generate a unique session ID
+  const sessionId = uuid(); // Generate a unique session ID
   const room = `inspect-${sessionId}`;
   const socket = new PartySocket({
     host,

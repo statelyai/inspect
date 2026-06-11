@@ -36,8 +36,14 @@
     "partysocket": "^0.0.25",
     "safe-stable-stringify": "^2.5.0",
     "superjson": "^1.13.3",
-    "uuid": "^9.0.1",
     "ws": "^8.20.0"
+  },
+  "imports": {
+    "#uuid": {
+      "worker": "./dist/uuid-browser.mjs",
+      "browser": "./dist/uuid-browser.mjs",
+      "default": "./dist/uuid-node.mjs"
+    }
   },
   "peerDependencies": {
     "xstate": "^5.5.1"
@@ -46,7 +52,6 @@
     "@changesets/changelog-github": "^0.5.2",
     "@changesets/cli": "^2.29.8",
     "@types/jsdom": "^21.1.7",
-    "@types/uuid": "^9.0.8",
     "@types/ws": "^8.18.1",
     "jsdom": "^23.2.0",
     "publint": "^0.3.15",

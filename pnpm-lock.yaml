@@ -23,9 +23,6 @@ importers:
       superjson:
         specifier: ^1.13.3
         version: 1.13.3
-      uuid:
-        specifier: ^9.0.1
-        version: 9.0.1
       ws:
         specifier: ^8.20.0
         version: 8.20.0
@@ -39,9 +36,6 @@ importers:
       '@types/jsdom':
         specifier: ^21.1.7
         version: 21.1.7
-      '@types/uuid':
-        specifier: ^9.0.8
-        version: 9.0.8
       '@types/ws':
         specifier: ^8.18.1
         version: 8.18.1
@@ -736,9 +730,6 @@ packages:
 
   '@types/tough-cookie@4.0.5':
     resolution: {integrity: sha512-/Ad8+nIOV7Rl++6f1BdKxFSMgmoqEoYbHRpPcx3JEfv8VRsQe9Z4mCXeJBzxs7mbHY/XOZZuXlRNfhpVPbs6ZA==, tarball: https://registry.npmjs.org/@types/tough-cookie/-/tough-cookie-4.0.5.tgz}
-
-  '@types/uuid@9.0.8':
-    resolution: {integrity: sha512-jg+97EGIcY9AGHJJRaaPVgetKDsrTgbRjQ5Msgjh/DQKEFl0DtyRr/VCOyD1T2R1MNeWPK/u7JoGhlDZnKBAfA==, tarball: https://registry.npmjs.org/@types/uuid/-/uuid-9.0.8.tgz}
 
   '@types/ws@8.18.1':
     resolution: {integrity: sha512-ThVF6DCVhA8kUGy+aazFQ4kXQ7E1Ty7A3ypFOe0IcJV8O/M511G99AW24irKrW56Wt44yG9+ij8FaqoBGkuBXg==, tarball: https://registry.npmjs.org/@types/ws/-/ws-8.18.1.tgz}
@@ -1629,10 +1620,6 @@ packages:
   url-parse@1.5.10:
     resolution: {integrity: sha512-WypcfiRhfeUP9vvF0j6rw0J3hrWrw6iZv3+22h6iRMJ/8z1Tj6XfLP4DsUix5MhMPnXpiHDoKyoZ/bdCkwBCiQ==, tarball: https://registry.npmjs.org/url-parse/-/url-parse-1.5.10.tgz}
 
-  uuid@9.0.1:
-    resolution: {integrity: sha512-b+1eJOlsR9K8HJpow9Ok3fiWOWSIcIzXodvv0rQjVoOVNpWMpxf1wZNpt4y9h10odCNrqnYp1OBzRktckBe3sA==, tarball: https://registry.npmjs.org/uuid/-/uuid-9.0.1.tgz}
-    hasBin: true
-
   vite-node@1.6.1:
     resolution: {integrity: sha512-YAXkfvGtuTzwWbDSACdJSg4A4DZiAqckWe90Zapc/sEX3XvHcw1NdurM/6od8J207tSDqNbSsgdCacBgvJKFuA==, tarball: https://registry.npmjs.org/vite-node/-/vite-node-1.6.1.tgz}
     engines: {node: ^18.0.0 || >=20.0.0}
@@ -2324,8 +2311,6 @@ snapshots:
       undici-types: 7.18.2
 
   '@types/tough-cookie@4.0.5': {}
-
-  '@types/uuid@9.0.8': {}
 
   '@types/ws@8.18.1':
     dependencies:
@@ -3219,8 +3204,6 @@ snapshots:
     dependencies:
       querystringify: 2.2.0
       requires-port: 1.0.0
-
-  uuid@9.0.1: {}
 
   vite-node@1.6.1(@types/node@25.5.2):
     dependencies:
