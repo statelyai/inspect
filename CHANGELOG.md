@@ -1,5 +1,11 @@
 # @statelyai/inspect
 
+## 0.7.2
+
+### Patch Changes
+
+- [#56](https://github.com/statelyai/inspect/pull/56) [`816a1a1`](https://github.com/statelyai/inspect/commit/816a1a1e8feed4fd7aa5d103d64a261873c5fd72) Thanks [@davidkpiano](https://github.com/davidkpiano)! - Remove the `uuid` dependency in favor of the platform-native `crypto.randomUUID()`, clearing CVE-2026-41907 flagged by downstream security scanners. A `#uuid` subpath import resolves to `node:crypto` in Node and the global `crypto` in browser/worker environments.
+
 ## 0.7.1
 
 ### Patch Changes
