@@ -35,7 +35,7 @@
     "isomorphic-ws": "^5.0.0",
     "partysocket": "^0.0.25",
     "safe-stable-stringify": "^2.5.0",
-    "superjson": "^1.13.3",
+    "superjson": "^2.2.6",
     "ws": "^8.20.0"
   },
   "imports": {
