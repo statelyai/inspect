@@ -1,5 +1,32 @@
 # Stately.ai Inspect
 
+## Legacy package
+
+<!-- legacy XState compatibility from package.json#peerDependencies -->
+
+`@statelyai/inspect` is the legacy inspection package for existing XState v5 integrations. Its current APIs and releases remain available. For new projects and XState v6, use `createInspector` from `@statelyai/sdk/inspect`:
+
+```bash
+npm install @statelyai/sdk
+```
+
+```ts
+import { createActor } from 'xstate';
+import { createInspector } from '@statelyai/sdk/inspect';
+import { machine } from './someMachine';
+
+const inspector = createInspector();
+const actor = createActor(machine, { inspect: inspector.inspect });
+actor.start();
+
+await inspector.ready;
+console.log(inspector.inspectorUrl);
+```
+
+The SDK does not open a browser automatically and omits snapshot context by default. It is not a drop-in replacement for this package. Read [Migrate to SDK inspection](https://github.com/statelyai/xstate/blob/next/docs/migrate-inspector.md) before migrating factories, options, manual inspection, or transports. There is no compatibility wrapper.
+
+The sections below document the existing legacy APIs.
+
 The `@statelyai/inspect` package enables developers to visually inspect state transitions and actor communication in any JavaScript/TypeScript app.
 
 **Documentation:** [stately.ai/docs/inspector](https://stately.ai/docs/inspector)
@@ -13,6 +40,8 @@ The `@statelyai/inspect` package enables developers to visually inspect state tr
 - **Works in Node.js** via WebSocket
 
 ## Installation
+
+<!-- legacy install command matching package.json#name -->
 
 ```bash
 npm install @statelyai/inspect
