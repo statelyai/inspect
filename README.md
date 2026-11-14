@@ -10,6 +10,8 @@
 npm install @statelyai/sdk
 ```
 
+By default, the SDK sends inspection events to the Stately-hosted relay at `wss://sky.stately.ai`. Treat the logged `inspectorUrl` as a private access link and share it only with intended viewers. To use a self-hosted SDK relay, pass its URL with `createInspector({ url })`.
+
 ```ts
 import { createActor } from 'xstate';
 import { createInspector } from '@statelyai/sdk/inspect';
